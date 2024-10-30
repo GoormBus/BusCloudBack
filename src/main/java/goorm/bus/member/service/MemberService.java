@@ -27,13 +27,12 @@ public class MemberService {
 
     public SingleResult<JwtTokenSet> register(MemberCreateReq req) {
         // 아이디 중복 체크
-        if (memberRepository.existByLoginId(req.loginId())) {
+        if (memberRepository.existByPhone(req.phone())) {
             throw new CustomException(ErrorCode.USER_ALREADY_EXIST);
         }
         Member newMember = Member.builder()
                 .memberId(UUID.randomUUID().toString())
-                .loginId(req.loginId())
-                .password(req.password())
+                .phone(req.phone())
                 .name(req.name())
 
                 .build();
@@ -45,7 +44,7 @@ public class MemberService {
     }
 
     public SingleResult<JwtTokenSet> login(MemberLoginReq req) {
-        Optional<Member> findMember = memberRepository.findByLoginId(req.loginId());
+        Optional<Member> findMember = memberRepository.findByPhone(req.phone());
         if(findMember.isEmpty()){
             throw new CustomException(ErrorCode.USER_NOT_EXIST);
         }
@@ -53,7 +52,7 @@ public class MemberService {
         Member member =findMember.get();
 
         // 비밀번호 검증
-        if (!member.getPassword().equals(req.password())) {
+        if (!member.getName().equals(req.name())) {
             throw new CustomException(ErrorCode.USER_WRONG_PASSWORD);
         }
 

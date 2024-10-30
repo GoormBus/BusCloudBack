@@ -6,12 +6,8 @@ import jakarta.validation.constraints.NotBlank;
 public record MemberCreateReq (
 
         @NotBlank
-        @Schema(description = "회원 id", example = "id")
-        String loginId,
-
-        @NotBlank
-        @Schema(description = "회원 비밀번호", example = "pwd")
-        String password,
+        @Schema(description = "회원 전화번호", example = "01033715386")
+        String phone,
 
         @NotBlank
         @Schema(description = "회원 이름", example = "최승호")

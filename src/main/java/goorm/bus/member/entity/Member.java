@@ -16,15 +16,13 @@ public class Member {
 
     @Id
     private String memberId;
-    private String loginId;
-    private String password;
+    private String phone;
     private String name;
 
     @Builder
-    public Member(String memberId, String loginId, String password, String name) {
+    public Member(String memberId, String phone, String name) {
         this.memberId= memberId;
-        this.loginId = loginId;
-        this.password = password;
+        this.phone = phone;
         this.name = name;
     }
 

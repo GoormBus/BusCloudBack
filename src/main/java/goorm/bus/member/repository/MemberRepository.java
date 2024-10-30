@@ -38,10 +38,10 @@ public class MemberRepository {
     }
 
     // memberId로 Member 조회
-    public Optional<Member> findByLoginId(String loginId) {
+    public Optional<Member> findByPhone(String phone) {
         try {
-            Member findMember = em.createQuery("select m from Member m where m.loginId = :id ", Member.class)
-                    .setParameter("id", loginId)
+            Member findMember = em.createQuery("select m from Member m where m.phone = :phone ", Member.class)
+                    .setParameter("phone", phone)
                     .getSingleResult();
             return Optional.of(findMember);
         } catch (NoResultException e) {
@@ -50,10 +50,10 @@ public class MemberRepository {
     }
 
     // memberId로 Member가 존재하는지 검사
-    public Boolean existByLoginId(String loginId) {
+    public Boolean existByPhone(String phone) {
         try {
-            Member findMember = em.createQuery("select m from Member m where m.loginId=:loginId", Member.class)
-                    .setParameter("loginId", loginId)
+            Member findMember = em.createQuery("select m from Member m where m.phone=:phone", Member.class)
+                    .setParameter("phone", phone)
                     .getSingleResult();
             return true; // 멤버가 존재하는 경우 true 반환
         } catch (NoResultException e) {
