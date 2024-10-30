@@ -1,0 +1,65 @@
+package goorm.bus.member.service;
+
+import goorm.bus.global.dto.response.JwtTokenSet;
+import goorm.bus.global.dto.response.result.SingleResult;
+import goorm.bus.global.exception.CustomException;
+import goorm.bus.global.exception.ErrorCode;
+import goorm.bus.global.service.AuthService;
+import goorm.bus.global.service.ResponseService;
+import goorm.bus.member.dto.request.MemberCreateReq;
+import goorm.bus.member.dto.request.MemberLoginReq;
+import goorm.bus.member.entity.Member;
+import goorm.bus.member.repository.MemberRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class MemberService {
+
+    private final MemberRepository memberRepository;
+    private final AuthService authService;
+
+    public SingleResult<JwtTokenSet> register(MemberCreateReq req) {
+        // 아이디 중복 체크
+        if (memberRepository.existByLoginId(req.loginId())) {
+            throw new CustomException(ErrorCode.USER_ALREADY_EXIST);
+        }
+        Member newMember = Member.builder()
+                .memberId(UUID.randomUUID().toString())
+                .loginId(req.loginId())
+                .password(req.password())
+                .name(req.name())
+
+                .build();
+        newMember = memberRepository.save(newMember);
+
+        JwtTokenSet jwtTokenSet = authService.generateToken(newMember.getMemberId());
+
+        return ResponseService.getSingleResult(jwtTokenSet);
+    }
+
+    public SingleResult<JwtTokenSet> login(MemberLoginReq req) {
+        Optional<Member> findMember = memberRepository.findByLoginId(req.loginId());
+        if(findMember.isEmpty()){
+            throw new CustomException(ErrorCode.USER_NOT_EXIST);
+        }
+
+        Member member =findMember.get();
+
+        // 비밀번호 검증
+        if (!member.getPassword().equals(req.password())) {
+            throw new CustomException(ErrorCode.USER_WRONG_PASSWORD);
+        }
+
+
+        JwtTokenSet jwtTokenSet = authService.generateToken(member.getMemberId());
+
+        return ResponseService.getSingleResult(jwtTokenSet);
+    }
+}
