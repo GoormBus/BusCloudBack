@@ -28,7 +28,7 @@ public class MemberController {
 
 
     @PostMapping("/login")
-    @Operation(summary = "로그인")
+    @Operation(summary = "로그인 && 회원가입(자동 로그인)")
     public SuccessResponse<SingleResult<JwtTokenSet>> login(@Valid @RequestBody MemberLoginReq req) {
         SingleResult<JwtTokenSet> result = memberService.login(req);
         return SuccessResponse.ok(result);

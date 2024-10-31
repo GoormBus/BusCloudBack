@@ -3,6 +3,11 @@ package goorm.bus.record.service;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Call;
+import com.twilio.twiml.VoiceResponse;
+import com.twilio.twiml.voice.Say;
+import goorm.bus.member.entity.Member;
+import goorm.bus.member.repository.MemberRepository;
+import goorm.bus.record.repository.NoteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +20,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -24,6 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 @RequiredArgsConstructor
 public class StationService {
+    private final MemberRepository memberRepository;
 
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -34,6 +42,8 @@ public class StationService {
     private final Map<String, Boolean> userStopCallingMap = new ConcurrentHashMap<>();
     private final Map<String, AtomicInteger> userCntMap = new ConcurrentHashMap<>();
     private final Map<String, Set<Integer>> userSeenBusesMap = new ConcurrentHashMap<>();
+    private static final long RUNNING_DURATION_HOURS = 3; // 3시간
+    private final LocalDateTime startTime = LocalDateTime.now();
 
     @Value("${twilio.account-sid}")
     private String accountSid;
@@ -55,6 +65,12 @@ public class StationService {
     // 5초마다 실행되는 메서드 - 사용자별로 독립적으로 동작
     @Scheduled(fixedRate = 5000)
     public void callBusApi() {
+        // 현재 시간이 시작 시간으로부터 3시간 경과했는지 확인
+        if (ChronoUnit.HOURS.between(startTime, LocalDateTime.now()) >= RUNNING_DURATION_HOURS) {
+            log.info("3시간이 경과하여 스케줄링을 중단합니다.");
+            return;  // 스케줄링 중단
+        }
+
         userStationIdMap.forEach((userId, stationId) -> {
             String busId = userBusIdMap.get(userId);
             Integer station = userStationMap.get(userId);
@@ -82,10 +98,14 @@ public class StationService {
                                     cnt.incrementAndGet();  // 새로운 버스일 경우 카운터 증가
                                     userCntMap.put(userId, cnt);
                                     log.info("현재 {} 사용자의 cnt 값: {}", userId, cnt);
-                                    try {
-                                        bus_call();
-                                    } catch (URISyntaxException e) {
-                                        throw new RuntimeException(e);
+                                    Optional<Member> byPhone = memberRepository.findByPhone2(userId);
+                                    if (byPhone.isPresent()) {
+                                        Member member = byPhone.get();
+                                        bus_call(member);
+                                        // member에 대한 로직 처리
+                                    } else {
+                                        // 값이 없을 때의 처리 로직
+                                        throw new NoSuchElementException("해당하는 사용자가 없습니다.");
                                     }
 
                                     if (cnt.get() >= 2) {
@@ -111,17 +131,42 @@ public class StationService {
         });
     }
 
-    private void bus_call() throws URISyntaxException {
+    private void bus_call(Member member) {
         Twilio.init(accountSid, authToken);
         log.info("버스 콜 실행");
+        String phone = member.getPhone();
+        String substring = phone.substring(1);
         String from = "+16232992975";
-        String to = "+821033715386";
+        String to = "+82" + substring;
+        log.info(to);
 
-        Call call = Call.creator(new com.twilio.type.PhoneNumber(to), new com.twilio.type.PhoneNumber(from),
-                new URI("http://demo.twilio.com/docs/voice.xml")).create();
+        // 사용자에게 전달할 음성 메시지 작성
+        Say say = new Say.Builder("안녕하세요, 이것은 당신을 위한 음성 메시지입니다.")
+                .language(Say.Language.KO_KR)
+                .voice(Say.Voice.ALICE)
+                .build();
+
+        VoiceResponse response = new VoiceResponse.Builder()
+                .say(say)
+                .build();
+
+        // VoiceResponse를 XML 문자열로 변환
+        String twiml = response.toXml();
+
+        // TwiML XML 문자열을 Twiml 객체로 감싸기
+        com.twilio.type.Twiml twimlObject = new com.twilio.type.Twiml(twiml);
+
+        // Twiml 객체를 사용하여 전화 걸기
+        Call call = Call.creator(
+                new com.twilio.type.PhoneNumber(to),
+                new com.twilio.type.PhoneNumber(from),
+                twimlObject
+        ).create();
 
         log.info("Twilio Call SID: {}", call.getSid());
     }
+
+
 
 }
 

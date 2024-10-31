@@ -14,12 +14,21 @@ public record NoteRequest(
         String destination,
 
         @NotBlank
-        @Schema(description = "정류장", example = "3")
-        String stopCnt,
+        @Schema(description = "정류장", example = "숫자 타입 3")
+        int station,
 
         @NotBlank
-        @Schema(description = "현재시간", example = "이건 아직 미정")
+        @Schema(description = "정류장 ID", example = "54686")
+        String stationId,
+
+        @NotBlank
+        @Schema(description = "노선 즉 버스ID ", example = "356")
+        String notionId,
+
+        @NotBlank
+        @Schema(description = "넘겨준 시간", example = "23:00")
         String time
 
-        ) {
+
+) {
 }
