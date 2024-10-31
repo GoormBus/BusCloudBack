@@ -45,10 +45,10 @@ public class StationService {
     private static final long RUNNING_DURATION_HOURS = 3; // 3시간
     private final LocalDateTime startTime = LocalDateTime.now();
 
-    @Value("${twilio.account-sid}")
+    @Value("${sid}")
     private String accountSid;
 
-    @Value("${twilio.auth-token}")
+    @Value("${token}")
     private String authToken;
 
     // 사용자별 API 호출 상태 설정 메서드
