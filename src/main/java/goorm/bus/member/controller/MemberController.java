@@ -25,18 +25,12 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @PostMapping
-    @Operation(summary = "회원가입")
-    public SuccessResponse<SingleResult<JwtTokenSet>> register(@Valid @RequestBody MemberCreateReq req) {
-        SingleResult<JwtTokenSet> result = memberService.register(req);
-        return SuccessResponse.ok(result);
-    }
+
 
     @PostMapping("/login")
     @Operation(summary = "로그인")
     public SuccessResponse<SingleResult<JwtTokenSet>> login(@Valid @RequestBody MemberLoginReq req) {
         SingleResult<JwtTokenSet> result = memberService.login(req);
-        log.info("dasfdf");
         return SuccessResponse.ok(result);
     }
 }

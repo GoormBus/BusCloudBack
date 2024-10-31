@@ -22,8 +22,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class MemberRepository {
 
     private final EntityManager em;
-    private final AtomicLong memberIdxGenerator = new AtomicLong(0);
-    private final Map<Long, Member> memberMap = new HashMap<>();
+
 
     // 저장
     public Member save(Member member) {
@@ -31,11 +30,6 @@ public class MemberRepository {
         return member;
     }
 
-    // id로 Member 조회
-    public Optional<Member> findById(Long id) {
-        Assert.notNull(id, "ID MUST NOT BE NULL");
-        return Optional.ofNullable(memberMap.get(id));
-    }
 
     // memberId로 Member 조회
     public Optional<Member> findByPhone(String phone) {
@@ -49,16 +43,6 @@ public class MemberRepository {
         }
     }
 
-    // memberId로 Member가 존재하는지 검사
-    public Boolean existByPhone(String phone) {
-        try {
-            Member findMember = em.createQuery("select m from Member m where m.phone=:phone", Member.class)
-                    .setParameter("phone", phone)
-                    .getSingleResult();
-            return true; // 멤버가 존재하는 경우 true 반환
-        } catch (NoResultException e) {
-            return false; // 결과가 없을 때 false 반환
-        }
-    }
+
 
 }

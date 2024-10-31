@@ -7,10 +7,6 @@ public record MemberLoginReq (
 
         @NotBlank
         @Schema(description = "회원 전화번호", example = "01033715386")
-        String phone,
-
-        @NotBlank
-        @Schema(description = "회원 이름", example = "최승호")
-        String name
+        String phone
 ) {
 }

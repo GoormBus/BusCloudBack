@@ -31,7 +31,8 @@ dependencies {
 
 	//스웨커
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
-
+	//ai 문자 때문에 추가
+	implementation 'org.json:json:20211205'
 // open ai
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
 	implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
@@ -45,6 +46,10 @@ dependencies {
 	implementation 'sh.platform:config:2.2.2'
 
 	implementation 'commons-io:commons-io:2.11.0' // 파일 입출력
+
+	//env
+	implementation 'io.github.cdimascio:java-dotenv:5.2.2'
+	implementation 'io.github.cdimascio:dotenv-java:2.2.0'
 	// JWT
 
 	compileOnly 'org.projectlombok:lombok'

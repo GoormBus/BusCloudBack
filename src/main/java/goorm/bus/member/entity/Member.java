@@ -17,13 +17,11 @@ public class Member {
     @Id
     private String memberId;
     private String phone;
-    private String name;
 
     @Builder
-    public Member(String memberId, String phone, String name) {
+    public Member(String memberId, String phone) {
         this.memberId= memberId;
         this.phone = phone;
-        this.name = name;
     }
 
     public Member() {
