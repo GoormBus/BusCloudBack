@@ -51,7 +51,7 @@ dependencies {
 	implementation 'io.github.cdimascio:java-dotenv:5.2.2'
 	implementation 'io.github.cdimascio:dotenv-java:2.2.0'
 	// JWT
-
+	runtimeOnly 'com.h2database:h2'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
