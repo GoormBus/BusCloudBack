@@ -32,8 +32,8 @@ public class NoteService {
         Note save = noteRepository.save(newRecord);
         return ResponseService.getSingleResult(save);
     }
-    public ListResult<NoteResponse> findAll() {
-        List<Note> notes = noteRepository.findAll();
+    public ListResult<NoteResponse> findAll(String memberId) {
+        List<Note> notes = noteRepository.findAll(memberId);
         List<NoteResponse> list = notes.stream().map(NoteResponse::of).toList();
         return ResponseService.getListResult(list);
     }

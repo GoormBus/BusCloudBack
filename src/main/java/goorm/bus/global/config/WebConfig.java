@@ -15,10 +15,10 @@ public class WebConfig implements WebMvcConfigurer {
         this.jwtInterceptor = jwtInterceptor;
     }
 
-//    @Override
-//    public void addInterceptors(InterceptorRegistry registry) {
-//        registry.addInterceptor(jwtInterceptor).addPathPatterns("/api/topic/**");
-//    }
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(jwtInterceptor).addPathPatterns("/api/bus/**");
+    }
 
 //    @Override
 //    public void addCorsMappings(CorsRegistry registry) {

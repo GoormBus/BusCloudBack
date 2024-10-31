@@ -21,8 +21,9 @@ public class NoteRepository {
         return note;
     }
 
-    public List<Note> findAll(){
-        return em.createQuery("select m from Note m",Note.class)
+    public List<Note> findAll(String memberId){
+        return em.createQuery("select m from Note m where m.id = : memberId",Note.class)
+                .setParameter("memberId",memberId)
                 .getResultList();
     }
 }

@@ -8,6 +8,7 @@ import goorm.bus.record.dto.request.NoteRequest;
 import goorm.bus.record.dto.request.StationRequest;
 import goorm.bus.record.dto.response.NoteResponse;
 import goorm.bus.record.entity.Note;
+import goorm.bus.record.repository.NoteRepository;
 import goorm.bus.record.service.NoteService;
 import goorm.bus.record.service.StationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,12 +32,16 @@ public class NoteController {
 
     private final StationService stationService;
 
+    private final NoteRepository noteRepository;
+
     @GetMapping("/list")
     @Operation(summary = "최근 버스 기록 저장 보여주기")
-    public SuccessResponse<ListResult<NoteResponse>> readAll() {
-        ListResult<NoteResponse> result = noteService.findAll();
+    public SuccessResponse<ListResult<NoteResponse>> readAll(  @RequestAttribute("id") String userId) {
+        ListResult<NoteResponse> result = noteService.findAll(userId);
         return SuccessResponse.ok(result);
     }
+
+
 
     @PostMapping
     @Operation(summary = "버스 출발, 도착, 정류장 수 받기")
@@ -45,15 +50,15 @@ public class NoteController {
         SingleResult<Note> save = noteService.save(req);
         return SuccessResponse.ok(save);
     }
-    //https://bus.jeju.go.kr/api/searchArrivalInfoList.do?station_id=405000155
+
 
     @PostMapping("/station")
-    public ResponseEntity<String> station(@Valid @RequestBody StationRequest req) {
-        String busId = req.busId();
+    public ResponseEntity<String> station(@Valid @RequestAttribute("id") String userId, @RequestBody StationRequest req){        String busId = req.busId();
         String stationId = req.stationId();
+        int station = req.station();
 
         // 30초마다 API 호출 시작
-        noteService.scheduleBusApiCall(stationId);
+        stationService.scheduleBusApiCall(userId,busId, stationId,station);
 
         // 즉시 응답 반환
         return ResponseEntity.ok("API 호출이 시작되었습니다.");

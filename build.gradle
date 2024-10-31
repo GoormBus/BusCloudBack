@@ -46,7 +46,7 @@ dependencies {
 	implementation 'sh.platform:config:2.2.2'
 
 	implementation 'commons-io:commons-io:2.11.0' // 파일 입출력
-
+	implementation 'com.twilio.sdk:twilio:8.0.0'
 	//env
 	implementation 'io.github.cdimascio:java-dotenv:5.2.2'
 	implementation 'io.github.cdimascio:dotenv-java:2.2.0'

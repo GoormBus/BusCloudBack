@@ -22,7 +22,7 @@ public class JwtInterceptor implements HandlerInterceptor {
             String jwtToken = token.substring(7);
             jwtUtil.verify(jwtToken);
 
-            Long id = jwtUtil.getId(jwtToken);
+            String id = jwtUtil.getId(jwtToken);
             request.setAttribute("id", id);
             return true;
         }
