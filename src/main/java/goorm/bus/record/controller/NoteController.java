@@ -98,6 +98,7 @@ public class NoteController {
     @PostMapping("/alarm")
     @Operation(summary = "알람 on off")
     public ResponseEntity<String> alarm(@Valid @RequestBody AlarmReq req){
+        log.info("123123");
         noteRepository.updateAlarm(req);
 
         // 즉시 응답 반환
