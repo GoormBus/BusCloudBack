@@ -1,8 +1,6 @@
-package goorm.bus.member.repository;
+package goorm.domain.member.domain.repository;
 
-import goorm.bus.member.entity.Member;
-import io.jsonwebtoken.lang.Assert;
-import jakarta.persistence.Entity;
+import goorm.domain.member.domain.entity.Member;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.transaction.Transactional;
@@ -10,10 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Transactional
