@@ -1,4 +1,4 @@
-package goorm.domain.record.dto.request;
+package goorm.domain.buslog.presentation.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
