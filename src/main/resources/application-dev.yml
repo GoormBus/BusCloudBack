@@ -1,0 +1,64 @@
+spring:
+  application:
+    name: GoormBus-dev
+
+  aot:
+    enabled: false  # AOT 비활성화 설정 추가
+
+  config:
+    import:
+      - optional:file:env/dev.env[.properties]
+
+  datasource:
+    url: ${MYSQL_URL}
+    username: ${MYSQL_USER}
+    password: ${MYSQL_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+  servlet:
+    multipart:
+      enabled: true
+      max-request-size: 30MB
+      max-file-size: 30MB
+
+  redis:
+    host: ${REDIS_HOST}
+    port: ${REDIS_PORT}
+    password: ${REDIS_PASSWORD}
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-expiration: ${JWT_ACCESS_EXPIRATION}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION}
+
+
+
+logging:
+  level:
+    root: INFO
+    org:
+      springframework:
+        web: ERROR
+
+
+
+
+
+
+openai:
+  api:
+    url: https://api.openai.com
+    key: ${OPENAI_API_KEY}
+  text:
+    model: gpt-4-turbo-preview
+
+
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 3000
+        readTimeout: 3000
