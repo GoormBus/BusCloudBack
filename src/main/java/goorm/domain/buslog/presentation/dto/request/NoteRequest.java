@@ -1,4 +1,4 @@
-package goorm.domain.record.dto.request;
+package goorm.domain.buslog.presentation.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -14,15 +14,15 @@ public record NoteRequest(
         String destination,
 
         @NotBlank
-        @Schema(description = "정류장", example = "숫자 타입 3")
-        int station,
+        @Schema(description = "정류장 전", example = "3")
+        Long station,
 
         @NotBlank
         @Schema(description = "정류장 ID", example = "54686")
         String stationId,
 
         @NotBlank
-        @Schema(description = "노선 즉 버스ID ", example = "356")
+        @Schema(description = "노선 즉 버스ID ", example = "110")
         String notionId,
 
         @NotBlank

@@ -1,14 +1,14 @@
-package goorm.domain.record.controller;
+package goorm.domain.buslog.presentation.controller;
 
-import goorm.domain.record.dto.request.AlarmReq;
-import goorm.domain.record.dto.request.NoteFavoriteRequest;
-import goorm.domain.record.dto.request.NoteRequest;
-import goorm.domain.record.dto.response.NoteResponse;
-import goorm.domain.record.dto.response.NoteSaveResponse;
-import goorm.domain.record.entity.Note;
-import goorm.domain.record.repository.NoteRepository;
-import goorm.domain.record.service.NoteService;
-import goorm.domain.record.service.StationService;
+import goorm.domain.buslog.domain.entity.BusLog;
+import goorm.domain.buslog.presentation.dto.request.AlarmReq;
+import goorm.domain.buslog.presentation.dto.request.NoteFavoriteRequest;
+import goorm.domain.buslog.presentation.dto.request.NoteRequest;
+import goorm.domain.buslog.presentation.dto.response.NoteResponse;
+import goorm.domain.buslog.presentation.dto.response.NoteSaveResponse;
+import goorm.domain.buslog.domain.repository.NoteRepository;
+import goorm.domain.buslog.application.service.NoteService;
+import goorm.domain.buslog.application.service.StationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -48,7 +48,7 @@ public class NoteController {
                                                           @RequestAttribute("id") String userId,
                                                     @RequestBody NoteRequest req
     ) {
-        SingleResult<Note> note = noteService.save(req,userId);
+        SingleResult<BusLog> note = noteService.save(req,userId);
 
 
 
@@ -58,7 +58,7 @@ public class NoteController {
         // 5초마다 API 호출 시작
         stationService.scheduleBusApiCall(userId,busId, stationId,station);
 
-        // Note 객체를 NoteSaveResponse로 변환
+        // BusLog 객체를 NoteSaveResponse로 변환
         NoteSaveResponse response = NoteSaveResponse.of(note.getData());
 
         // 변환된 NoteSaveResponse를 응답으로 반환
@@ -70,13 +70,13 @@ public class NoteController {
     @PostMapping("/favorite")
     @Operation(summary = "즐겨 찾기 API")
     public ResponseEntity<String> delete(@Valid @RequestBody NoteFavoriteRequest req){
-        Optional<Note> findNote =noteRepository.findById(req.id());
+        Optional<BusLog> findNote =noteRepository.findById(req.id());
         if (findNote.isPresent()) {
-            Note note = findNote.get();
+            BusLog busLog = findNote.get();
             if(req.favorite()){
                 noteRepository.updelete(req,2);
             }else{
-                if(note.getFavorite_pre()!=1){
+                if(busLog.getFavorite_pre()!=1){
                     noteRepository.delete(req);
                 }
             }

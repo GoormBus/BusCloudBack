@@ -1,4 +1,4 @@
-package goorm.domain.record.service;
+package goorm.domain.buslog.application.service;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.twilio.Twilio;
