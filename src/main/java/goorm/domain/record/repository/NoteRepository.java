@@ -1,9 +1,8 @@
-package goorm.bus.record.repository;
+package goorm.domain.record.repository;
 
-import goorm.bus.member.entity.Member;
-import goorm.bus.record.dto.request.AlarmReq;
-import goorm.bus.record.dto.request.NoteFavoriteRequest;
-import goorm.bus.record.entity.Note;
+import goorm.domain.record.dto.request.AlarmReq;
+import goorm.domain.record.dto.request.NoteFavoriteRequest;
+import goorm.domain.record.entity.Note;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.transaction.Transactional;

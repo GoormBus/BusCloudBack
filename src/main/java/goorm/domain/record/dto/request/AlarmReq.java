@@ -1,4 +1,4 @@
-package goorm.bus.record.dto.request;
+package goorm.domain.record.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

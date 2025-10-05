@@ -1,13 +1,10 @@
-package goorm.bus.record.entity;
+package goorm.domain.record.entity;
 
-import goorm.bus.member.entity.Member;
+import goorm.domain.member.domain.entity.Member;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Getter
 @Setter

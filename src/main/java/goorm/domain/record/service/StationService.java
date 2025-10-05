@@ -1,16 +1,14 @@
-package goorm.bus.record.service;
+package goorm.domain.record.service;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Call;
 import com.twilio.twiml.VoiceResponse;
 import com.twilio.twiml.voice.Say;
-import goorm.bus.member.entity.Member;
-import goorm.bus.member.repository.MemberRepository;
-import goorm.bus.record.repository.NoteRepository;
+import goorm.domain.member.domain.entity.Member;
+import goorm.domain.member.domain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -18,8 +16,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;

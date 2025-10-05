@@ -1,14 +1,12 @@
-package goorm.bus.record.service;
+package goorm.domain.record.service;
 
-import goorm.bus.global.dto.response.result.ListResult;
-import goorm.bus.global.dto.response.result.SingleResult;
-import goorm.bus.global.service.ResponseService;
-import goorm.bus.member.entity.Member;
-import goorm.bus.member.repository.MemberRepository;
-import goorm.bus.record.dto.request.NoteRequest;
-import goorm.bus.record.dto.response.NoteResponse;
-import goorm.bus.record.entity.Note;
-import goorm.bus.record.repository.NoteRepository;
+
+import goorm.domain.member.domain.entity.Member;
+import goorm.domain.member.domain.repository.MemberRepository;
+import goorm.domain.record.dto.request.NoteRequest;
+import goorm.domain.record.dto.response.NoteResponse;
+import goorm.domain.record.entity.Note;
+import goorm.domain.record.repository.NoteRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,17 +1,14 @@
-package goorm.bus.record.controller;
+package goorm.domain.record.controller;
 
-import goorm.bus.global.dto.response.SuccessResponse;
-import goorm.bus.global.dto.response.result.ListResult;
-import goorm.bus.global.dto.response.result.SingleResult;
-import goorm.bus.record.dto.request.AlarmReq;
-import goorm.bus.record.dto.request.NoteFavoriteRequest;
-import goorm.bus.record.dto.request.NoteRequest;
-import goorm.bus.record.dto.response.NoteResponse;
-import goorm.bus.record.dto.response.NoteSaveResponse;
-import goorm.bus.record.entity.Note;
-import goorm.bus.record.repository.NoteRepository;
-import goorm.bus.record.service.NoteService;
-import goorm.bus.record.service.StationService;
+import goorm.domain.record.dto.request.AlarmReq;
+import goorm.domain.record.dto.request.NoteFavoriteRequest;
+import goorm.domain.record.dto.request.NoteRequest;
+import goorm.domain.record.dto.response.NoteResponse;
+import goorm.domain.record.dto.response.NoteSaveResponse;
+import goorm.domain.record.entity.Note;
+import goorm.domain.record.repository.NoteRepository;
+import goorm.domain.record.service.NoteService;
+import goorm.domain.record.service.StationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
