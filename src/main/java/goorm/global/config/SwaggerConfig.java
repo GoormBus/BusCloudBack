@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 @OpenAPIDefinition(
         info = @Info(
-                title = "Pironeer Week2 API 명세서",
+                title = "제주 버스 알림콜 명세서",
                 description = "API 명세서",
                 version = "v1",
                 contact = @Contact(
@@ -17,5 +17,5 @@ import org.springframework.context.annotation.Configuration;
         )
 )
 @Configuration
-public class OpenApiConfig {
+public class SwaggerConfig {
 }
