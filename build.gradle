@@ -1,12 +1,14 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.2.4'
-	id 'io.spring.dependency-management' version '1.1.4'
+	id 'org.springframework.boot' version '3.3.8'
+	id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'goorm'
 version = '0.0.1-SNAPSHOT'
-
+ext {
+	set('springCloudVersion', "2023.0.1")
+}
 java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(17)
@@ -23,40 +25,35 @@ repositories {
 	mavenCentral()
 }
 
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-
-
-	//스웨커
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
-	//ai 문자 때문에 추가
-	implementation 'org.json:json:20211205'
-// open ai
-	implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
-	implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
-	implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+	implementation 'org.jsoup:jsoup:1.16.1'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
 
-	implementation 'com.theokanning.openai-gpt3-java:client:0.10.0'
-	implementation 'com.theokanning.openai-gpt3-java:service:0.10.0'
-
-	implementation 'com.stripe:stripe-java:23.2.0'
-	implementation 'javax.xml.bind:jaxb-api:2.3.1'
-	implementation 'sh.platform:config:2.2.2'
-
-	implementation 'commons-io:commons-io:2.11.0' // 파일 입출력
-	implementation 'com.twilio.sdk:twilio:8.0.0'
-	//env
-	implementation 'io.github.cdimascio:java-dotenv:5.2.2'
-	implementation 'io.github.cdimascio:dotenv-java:2.2.0'
-	// JWT
-	runtimeOnly 'com.h2database:h2'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'org.mariadb.jdbc:mariadb-java-client:3.3.2'
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
-	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
