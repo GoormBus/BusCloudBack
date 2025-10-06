@@ -3,7 +3,7 @@ package goorm.domain.buslog.presentation.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 
-public record NoteRequest(
+public record BusLogSaveReq(
 
         @NotBlank
         @Schema(description = "출발지", example = "제주공항")
@@ -23,11 +23,9 @@ public record NoteRequest(
 
         @NotBlank
         @Schema(description = "노선 즉 버스ID ", example = "110")
-        String notionId,
+        String notionId
 
-        @NotBlank
-        @Schema(description = "넘겨준 시간", example = "23:00")
-        String time
+
 
 
 ) {

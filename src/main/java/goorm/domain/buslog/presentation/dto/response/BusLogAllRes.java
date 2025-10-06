@@ -8,10 +8,10 @@ import lombok.Builder;
 
 
 @Builder
-public record NoteSaveResponse(
+public record BusLogAllRes(
 
         @NotNull
-        @Schema(description = "게시물 ID", example = "1")
+        @Schema(description = "버스 기록 ID", example = "1")
         Long id,
         @NotBlank
         @Schema(description = "출발지", example = "제주공항")
@@ -22,12 +22,8 @@ public record NoteSaveResponse(
         String destination,
 
         @NotBlank
-        @Schema(description = "정류장", example = "3")
-        int station,
-
-        @NotBlank
-        @Schema(description = "넘겨준 시간", example = "23:00")
-        String time,
+        @Schema(description = "설정한 정류장 수", example = "3")
+        Long station,
 
         @NotBlank
         @Schema(description = "노선 즉 버스ID ", example = "356")
@@ -35,18 +31,20 @@ public record NoteSaveResponse(
 
         @NotBlank
         @Schema(description = "정류장 ID", example = "54686")
-        String stationId
+        String stationId,
+
+        @NotBlank
+        @Schema(description = "알람 활성화", example = "true or false")
+        boolean isAlarmFlag,
+
+        @NotBlank
+        @Schema(description = "즐겨찾기", example = "true or false")
+        boolean isFavoriteFlag
+
 
 ) {
-    public static NoteSaveResponse of(BusLog busLog) {
-        return NoteSaveResponse.builder()
-                .id(busLog.getId())
-                .departure(busLog.getDeparture())
-                .destination(busLog.getDestination())
-                .station(busLog.getStation())
-                .time(busLog.getTime())
-                .stationId(busLog.getStationId())
-                .notionId(busLog.getNotionId())
-                .build();
+    public static BusLogAllRes of(BusLog busLog, boolean isAlarmFlag, boolean isFavoriteFlag) {
+        return new BusLogAllRes(busLog.getId(), busLog.getDeparture(), busLog.getDestination(), busLog.getStation(),
+                busLog.getNotionId(), busLog.getStationId(), isAlarmFlag, isFavoriteFlag);
     }
 }
