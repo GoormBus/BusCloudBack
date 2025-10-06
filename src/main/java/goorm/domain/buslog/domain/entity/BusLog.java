@@ -56,19 +56,16 @@ public class BusLog {
     private LocalDateTime createdAt;
 
     @Builder
-    public BusLog(String departure, String destination, int station, String time,
-                  boolean alarm, boolean favorite, String stationId, String notionId,
-                  Member member, int favorite_pre) {
+    public BusLog(Member member,String departure, String destination, Long station,
+                  String stationId, String notionId
+                  ) {
+        this.member=member;
         this.departure = departure;
         this.destination = destination;
         this.station = station;
-        this.time = time;
-        this.alarm = alarm;
-        this.favorite = favorite;
         this.stationId=stationId;
         this.notionId=notionId;
-        this.member=member;
-        this.favorite_pre=favorite_pre;
+
     }
 
 }

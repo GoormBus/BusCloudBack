@@ -5,9 +5,8 @@ import goorm.domain.buslog.presentation.dto.request.AlarmReq;
 import goorm.domain.buslog.presentation.dto.request.NoteFavoriteRequest;
 import goorm.domain.buslog.presentation.dto.request.NoteRequest;
 import goorm.domain.buslog.presentation.dto.response.NoteResponse;
-import goorm.domain.buslog.presentation.dto.response.NoteSaveResponse;
-import goorm.domain.buslog.domain.repository.NoteRepository;
-import goorm.domain.buslog.application.service.NoteService;
+import goorm.domain.buslog.domain.repository.BusLogRepository;
+import goorm.domain.buslog.application.service.BusLogServiceImpl;
 import goorm.domain.buslog.application.service.StationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,6 +14,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.NoSuchElementException;
@@ -27,36 +27,26 @@ import java.util.Optional;
 @Slf4j
 public class NoteController {
 
-    private final NoteService noteService;
+    private final BusLogServiceImpl busLogServiceImpl;
 
     private final StationService stationService;
 
-    private final NoteRepository noteRepository;
-
-    @GetMapping("/list")
-    @Operation(summary = "즐겨찾기 버스 기록 저장 보여주기")
-    public SuccessResponse<ListResult<NoteResponse>> readAll(@RequestAttribute("id") String userId) {
-        ListResult<NoteResponse> note = noteService.findAll(userId);
-        return SuccessResponse.ok(note);
-    }
+    private final BusLogRepository noteRepository;
 
 
-
-    @PostMapping("/save")
     @Operation(summary = "버스 데이터 정보들이 쭉 넘어옴 여기서 전화 콜 및 일시 저장해줘야됨 즉 즐격찾기 false")
-    public SuccessResponse<NoteSaveResponse> create(@Valid
-                                                          @RequestAttribute("id") String userId,
-                                                    @RequestBody NoteRequest req
-    ) {
-        SingleResult<BusLog> note = noteService.save(req,userId);
+    @PostMapping("/save")
+    public ResponseEntity<Void> create(@Valid @RequestBody NoteRequest req,
+                                       @AuthenticationPrincipal String userId) {
 
+        busLogServiceImpl.save(req, userId);
 
 
         String stationId = req.stationId();
         int station = req.station();
-        String busId =req.notionId();
+        String busId = req.notionId();
         // 5초마다 API 호출 시작
-        stationService.scheduleBusApiCall(userId,busId, stationId,station);
+        stationService.scheduleBusApiCall(userId, busId, stationId, station);
 
         // BusLog 객체를 NoteSaveResponse로 변환
         NoteSaveResponse response = NoteSaveResponse.of(note.getData());
@@ -67,16 +57,25 @@ public class NoteController {
     }
 
 
+    @GetMapping("/list")
+    @Operation(summary = "즐겨찾기 버스 기록 저장 보여주기")
+    public SuccessResponse<ListResult<NoteResponse>> readAll(@RequestAttribute("id") String userId) {
+        ListResult<NoteResponse> note = busLogServiceImpl.findAll(userId);
+        return SuccessResponse.ok(note);
+    }
+
+
+
     @PostMapping("/favorite")
     @Operation(summary = "즐겨 찾기 API")
-    public ResponseEntity<String> delete(@Valid @RequestBody NoteFavoriteRequest req){
-        Optional<BusLog> findNote =noteRepository.findById(req.id());
+    public ResponseEntity<String> delete(@Valid @RequestBody NoteFavoriteRequest req) {
+        Optional<BusLog> findNote = noteRepository.findById(req.id());
         if (findNote.isPresent()) {
             BusLog busLog = findNote.get();
-            if(req.favorite()){
-                noteRepository.updelete(req,2);
-            }else{
-                if(busLog.getFavorite_pre()!=1){
+            if (req.favorite()) {
+                noteRepository.updelete(req, 2);
+            } else {
+                if (busLog.getFavorite_pre() != 1) {
                     noteRepository.delete(req);
                 }
             }
@@ -85,16 +84,13 @@ public class NoteController {
             // 값이 없을 때의 처리 로직
             throw new NoSuchElementException("해당하는 사용자가 없습니다.");
         }
-
-
-
         // 즉시 응답 반환
         return ResponseEntity.ok("설정 완료");
     }
 
     @PostMapping("/alarm")
     @Operation(summary = "알람 on off")
-    public ResponseEntity<String> alarm(@Valid @RequestBody AlarmReq req){
+    public ResponseEntity<String> alarm(@Valid @RequestBody AlarmReq req) {
         log.info("123123");
         noteRepository.updateAlarm(req);
 

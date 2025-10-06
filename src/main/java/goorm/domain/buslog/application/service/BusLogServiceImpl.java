@@ -6,7 +6,9 @@ import goorm.domain.member.domain.entity.Member;
 import goorm.domain.member.domain.repository.MemberRepository;
 import goorm.domain.buslog.presentation.dto.request.NoteRequest;
 import goorm.domain.buslog.presentation.dto.response.NoteResponse;
-import goorm.domain.buslog.domain.repository.NoteRepository;
+import goorm.domain.buslog.domain.repository.BusLogRepository;
+import goorm.global.infra.exception.error.ErrorCode;
+import goorm.global.infra.exception.error.GoormBusException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,46 +17,36 @@ import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.time.LocalTime;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class NoteService {
+@Transactional
+public class BusLogServiceImpl {
 
-    private final NoteRepository noteRepository;
+    private final BusLogRepository busLogRepository;
 
     private final MemberRepository memberRepository;
 
     private final StationService stationService;
 
-    public SingleResult<BusLog> save(NoteRequest req, String userId){
+    public void save(NoteRequest req, String userId){
 
-        BusLog newRecord= BusLog.builder()
+        Member findMember = memberRepository.findById(userId).orElse(null);
+        if(findMember == null) throw new GoormBusException(ErrorCode.USER_NOT_EXIST);
+
+        BusLog newBusLog= BusLog.builder()
+                .member(findMember)
                 .departure(req.departure())
                 .destination(req.destination())
                 .station(req.station())
-                .time(req.time())
-                .alarm(true)
                 .notionId(req.notionId())
                 .stationId(req.stationId())
-                .favorite(false)
-                .favorite_pre(1)
                 .build();
 
-        Optional<Member> findMember = memberRepository.findByPhone2(userId);
-        if (findMember.isPresent()) {
-            Member member = findMember.get();
-            newRecord.setMember(member);
-            // member에 대한 로직 처리
-        } else {
-            // 값이 없을 때의 처리 로직
-            throw new NoSuchElementException("해당하는 사용자가 없습니다.");
-        }
-        BusLog save = noteRepository.save(newRecord);
-        return ResponseService.getSingleResult(save);
+        busLogRepository.save(newBusLog);
+
     }
     public ListResult<NoteResponse> findAll(String memberId) {
         List<BusLog> busLogs = noteRepository.findAll(memberId);
