@@ -2,12 +2,8 @@ package goorm.domain.buslog.presentation.controller;
 
 import goorm.domain.buslog.application.service.BusLogService;
 import goorm.domain.buslog.presentation.dto.request.BusFavoriteReq;
-import goorm.domain.buslog.presentation.dto.request.NoteFavoriteRequest;
 import goorm.domain.buslog.presentation.dto.request.BusLogSaveReq;
 import goorm.domain.buslog.presentation.dto.response.BusLogAllRes;
-import goorm.domain.buslog.domain.repository.BusLogRepository;
-import goorm.domain.buslog.application.service.impl.BusLogServiceImpl;
-import goorm.domain.buslog.application.service.StationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

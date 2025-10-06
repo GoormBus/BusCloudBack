@@ -1,4 +1,4 @@
-package goorm.domain.buslog.application.service;
+package goorm.domain.busalarm.application.service.scheduled;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.twilio.Twilio;

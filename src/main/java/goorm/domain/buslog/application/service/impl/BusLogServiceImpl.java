@@ -4,7 +4,7 @@ package goorm.domain.buslog.application.service.impl;
 import goorm.domain.busalarm.domain.entity.BusAlarm;
 import goorm.domain.busalarm.domain.repository.BusAlarmRepository;
 import goorm.domain.buslog.application.service.BusLogService;
-import goorm.domain.buslog.application.service.StationService;
+import goorm.domain.busalarm.application.service.scheduled.StationService;
 import goorm.domain.buslog.domain.entity.BusFavorite;
 import goorm.domain.buslog.domain.entity.BusLog;
 import goorm.domain.buslog.domain.repository.BusFavoriteRepository;
@@ -19,13 +19,10 @@ import goorm.global.infra.exception.error.GoormBusException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.time.LocalTime;
 
 @Service
 @RequiredArgsConstructor
@@ -93,7 +90,5 @@ public class BusLogServiceImpl implements BusLogService {
         else findBusFavorite.activateIsFavoriteFlag();
 
     }
-
-
 
 }
