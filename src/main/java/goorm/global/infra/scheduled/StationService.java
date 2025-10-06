@@ -1,10 +1,6 @@
 package goorm.global.infra.scheduled;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.twilio.Twilio;
-import com.twilio.rest.api.v2010.account.Call;
-import com.twilio.twiml.VoiceResponse;
-import com.twilio.twiml.voice.Say;
+
 import goorm.domain.busalarm.domain.entity.BusAlarm;
 import goorm.domain.busalarm.domain.repository.BusAlarmRepository;
 import goorm.domain.buslog.domain.entity.BusLog;
