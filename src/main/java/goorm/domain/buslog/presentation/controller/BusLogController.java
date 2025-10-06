@@ -34,7 +34,7 @@ public class BusLogController {
 
 
     @Operation(summary = "버스 데이터 정보들이 쭉 넘어옴 여기서 전화 콜 및 일시 저장해줘야됨 즉 즐격찾기 false")
-    @PostMapping("/save")
+    @PostMapping
     public ResponseEntity<Void> saveBusLog(@Valid @RequestBody BusLogSaveReq req,
                                        @AuthenticationPrincipal String userId) {
 
@@ -55,17 +55,15 @@ public class BusLogController {
         // 즉시 note 객체 응답 반환
     }
 
-
-    @GetMapping("/list")
-    @Operation(summary = "즐겨찾기 버스 기록 저장 보여주기")
+    @Operation(summary = "즐겨찾기 버스 기록 저장들 보여주기")
+    @GetMapping
     public ResponseEntity<List<BusLogAllRes>> getBusLogAll(@AuthenticationPrincipal String userId) {
         return ResponseEntity.ok(busLogService.getBusLogAll(userId));
     }
 
 
-
-    @PostMapping("/favorite")
     @Operation(summary = "즐겨 찾기 API")
+    @PostMapping("/favorite")
     public ResponseEntity<Void> updateBusFavorite(@Valid @RequestBody BusFavoriteReq req) {
         busLogService.updateBusFavorite(req);
         return ResponseEntity.ok().build();
