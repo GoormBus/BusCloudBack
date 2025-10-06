@@ -1,8 +1,10 @@
-package goorm.domain.buslog.application.service;
+package goorm.domain.buslog.application.service.impl;
 
 
 import goorm.domain.busalarm.domain.entity.BusAlarm;
 import goorm.domain.busalarm.domain.repository.BusAlarmRepository;
+import goorm.domain.buslog.application.service.BusLogService;
+import goorm.domain.buslog.application.service.StationService;
 import goorm.domain.buslog.domain.entity.BusFavorite;
 import goorm.domain.buslog.domain.entity.BusLog;
 import goorm.domain.buslog.domain.repository.BusFavoriteRepository;
@@ -29,7 +31,7 @@ import java.time.LocalTime;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional
-public class BusLogServiceImpl {
+public class BusLogServiceImpl implements BusLogService {
 
     private final BusLogRepository busLogRepository;
     private final BusFavoriteRepository busFavoriteRepository;
@@ -39,6 +41,7 @@ public class BusLogServiceImpl {
 
     private final StationService stationService;
 
+    @Override
     public void postBusLogSave(BusLogSaveReq req, String userId){
 
         Member findMember = memberRepository.findById(userId).orElse(null);
@@ -55,6 +58,8 @@ public class BusLogServiceImpl {
 
         busLogRepository.save(newBusLog);
     }
+
+    @Override
     public List<BusLogAllRes> getBusLogAll(String memberId) {
         Member findMember = memberRepository.findById(memberId).orElse(null);
         if(findMember == null) throw new GoormBusException(ErrorCode.USER_NOT_EXIST);
@@ -75,6 +80,8 @@ public class BusLogServiceImpl {
         return result;
     }
 
+
+    @Override
     public void updateBusFavorite(BusFavoriteReq req){
         BusLog findBusLog = busLogRepository.findById(req.busLogId()).orElse(null);
         if(findBusLog == null) throw new GoormBusException(ErrorCode.BUS_LOG_NOT_EXIST);
@@ -89,48 +96,4 @@ public class BusLogServiceImpl {
 
 
 
-    // 매일 자정에 실행 최대 빈도수 1씩 증가
-    @Scheduled(cron = "0 0 0 * * ?")
-    @Transactional
-    public void incrementMaxForNotesWithAlarm() {
-        List<BusLog> notesWithAlarm = noteRepository.findByAlarmTrue(); // alarm이 true인 BusLog 조회
-
-        for (BusLog busLog : notesWithAlarm) {
-            busLog.setFrequency(busLog.getFrequency() + 1);  // max 값 1 증가
-            busLog.setExecute(false);
-           if(busLog.getFavorite_pre()==1){
-               noteRepository.deletePre(busLog);
-           }
-        }
-
-        // 별도 업데이트 안해도 될듯
-    }
-
-    @Scheduled(cron = "0 * * * * ?") // 1분마다 실행
-    @Transactional
-    public void alarmEveryDay() {
-        // alarm이 true인 BusLog 조회
-        List<BusLog> notesWithAlarm = noteRepository.findByAlarmTrueisExcute();
-        LocalTime now = LocalTime.now(); // 현재 시간
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-
-        for (BusLog busLog : notesWithAlarm) {
-            if (busLog.getTime() != null) { // note의 time이 null이 아닌 경우에만 진행
-                LocalTime noteTime = LocalTime.parse(busLog.getTime(), formatter); // String을 LocalTime으로 변환
-
-                // 현재 시간이 noteTime 이후라면 stationService 메서드 호출
-                if (now.isAfter(noteTime)) {
-                    stationService.scheduleBusApiCall(
-                            busLog.getMember().getMemberId(),
-                            busLog.getNotionId(),
-                            busLog.getStationId(),
-                            busLog.getStation()
-                    );
-                }
-
-                // 실행된 Note의 executed 필드를 true로 설정
-                busLog.setExecute(true);
-            }
-        }
-    }
 }

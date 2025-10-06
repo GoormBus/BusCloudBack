@@ -1,11 +1,12 @@
 package goorm.domain.buslog.presentation.controller;
 
+import goorm.domain.buslog.application.service.BusLogService;
 import goorm.domain.buslog.presentation.dto.request.BusFavoriteReq;
 import goorm.domain.buslog.presentation.dto.request.NoteFavoriteRequest;
 import goorm.domain.buslog.presentation.dto.request.BusLogSaveReq;
 import goorm.domain.buslog.presentation.dto.response.BusLogAllRes;
 import goorm.domain.buslog.domain.repository.BusLogRepository;
-import goorm.domain.buslog.application.service.BusLogServiceImpl;
+import goorm.domain.buslog.application.service.impl.BusLogServiceImpl;
 import goorm.domain.buslog.application.service.StationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,7 +26,7 @@ import java.util.List;
 @Slf4j
 public class BusLogController {
 
-    private final BusLogServiceImpl busLogServiceImpl;
+    private final BusLogService busLogService;
 
     private final StationService stationService;
 
@@ -37,7 +38,7 @@ public class BusLogController {
     public ResponseEntity<Void> saveBusLog(@Valid @RequestBody BusLogSaveReq req,
                                        @AuthenticationPrincipal String userId) {
 
-        busLogServiceImpl.postBusLogSave(req, userId);
+        busLogService.postBusLogSave(req, userId);
 
 
         String stationId = req.stationId();
@@ -58,7 +59,7 @@ public class BusLogController {
     @GetMapping("/list")
     @Operation(summary = "즐겨찾기 버스 기록 저장 보여주기")
     public ResponseEntity<List<BusLogAllRes>> getBusLogAll(@AuthenticationPrincipal String userId) {
-        return ResponseEntity.ok(busLogServiceImpl.getBusLogAll(userId));
+        return ResponseEntity.ok(busLogService.getBusLogAll(userId));
     }
 
 
@@ -66,7 +67,7 @@ public class BusLogController {
     @PostMapping("/favorite")
     @Operation(summary = "즐겨 찾기 API")
     public ResponseEntity<Void> updateBusFavorite(@Valid @RequestBody BusFavoriteReq req) {
-        busLogServiceImpl.updateBusFavorite(req);
+        busLogService.updateBusFavorite(req);
         return ResponseEntity.ok().build();
     }
 
