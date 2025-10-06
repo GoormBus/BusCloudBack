@@ -51,4 +51,12 @@ public class BusAlarm {
         this.isExecuteFlag = true;
         this.alarmRemaining = 2L;
     }
+
+    public void activateIsAlarmFlag() {
+        this.isAlarmFlag = true;
+    }
+
+    public void deactivateIsAlarmFlag() {
+        this.isAlarmFlag = false;
+    }
 }

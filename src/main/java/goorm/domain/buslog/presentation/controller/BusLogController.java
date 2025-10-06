@@ -1,7 +1,5 @@
 package goorm.domain.buslog.presentation.controller;
 
-import goorm.domain.buslog.domain.entity.BusLog;
-import goorm.domain.buslog.presentation.dto.request.AlarmReq;
 import goorm.domain.buslog.presentation.dto.request.BusFavoriteReq;
 import goorm.domain.buslog.presentation.dto.request.NoteFavoriteRequest;
 import goorm.domain.buslog.presentation.dto.request.BusLogSaveReq;
@@ -19,8 +17,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -74,29 +70,6 @@ public class BusLogController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/alarm")
-    @Operation(summary = "알람 on off")
-    public ResponseEntity<String> alarm(@Valid @RequestBody AlarmReq req) {
-        log.info("123123");
-        noteRepository.updateAlarm(req);
 
-        // 즉시 응답 반환
-        return ResponseEntity.ok("업데이트 완료");
-    }
-
-//    @PostMapping("/station")
-//    @Operation(summary = "버스 전화 API //2")
-//    public ResponseEntity<String> station(@Valid @RequestAttribute("id") String userId, @RequestBody StationRequest req){
-//
-//        String busId = req.busId();
-//        String stationId = req.stationId();
-//        int station = req.station();
-//
-//        // 30초마다 API 호출 시작
-//        stationService.scheduleBusApiCall(userId,busId, stationId,station);
-//
-//        // 즉시 응답 반환
-//        return ResponseEntity.ok("API 호출이 시작되었습니다.");
-//    }
 
 }
