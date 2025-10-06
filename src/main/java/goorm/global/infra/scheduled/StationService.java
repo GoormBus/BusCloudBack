@@ -35,13 +35,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 @RequiredArgsConstructor
 public class StationService {
-    private final MemberRepository memberRepository;
     private final BusLogRepository busLogRepository;
     private final JejuBusClient jejuBusClient;
     private final BusAlarmRepository busAlarmRepository;
-
-    private String accountSid = "AC6daasdf7c0729c";
-    private String authToken = "4d";
 
 
     // 30초마다 실행되는 메서드 - 사용자별로 독립적으로 동작
@@ -59,12 +55,12 @@ public class StationService {
             if (findBusAlarm.getAlarmRemaining() == 0L) continue;
 
 
-            checkBusArrivalAndNotify(busLog);
+            checkBusArrivalAndNotify(busLog, findBusAlarm);
         }
 
     }
 
-    private void checkBusArrivalAndNotify(BusLog busLog) {
+    private void checkBusArrivalAndNotify(BusLog busLog, BusAlarm busAlarm) {
         ArrivalResponse response = jejuBusClient.getArrivalInfo(busLog.getStationId());
         if (response == null || response.getResultList() == null) {
             throw new GoormBusException(ErrorCode.JEJU_RESPONSE_NOT_EXIST);
@@ -77,44 +73,10 @@ public class StationService {
 
             // 잔여랑 api response 응답값이랑 똑같을때 알림콜 호출
             if (remainStation == busLogStation) {
+                busAlarm.updateAlarmRemaining(); // -1 씩 감소
 
             }
         });
-    }
-
-    private void bus_call(Member member) {
-        Twilio.init(accountSid, authToken);
-        log.info("버스 콜 실행");
-        String phone = member.getPhone();
-        String substring = phone.substring(1);
-        String from = "+16232992975";
-        String to = "+82" + substring;
-        log.info(to);
-
-        // 사용자에게 전달할 음성 메시지 작성
-        Say say = new Say.Builder("안녕하세요, 이것은 당신을 위한 음성 메시지입니다.")
-                .language(Say.Language.KO_KR)
-                .voice(Say.Voice.ALICE)
-                .build();
-
-        VoiceResponse response = new VoiceResponse.Builder()
-                .say(say)
-                .build();
-
-        // VoiceResponse를 XML 문자열로 변환
-        String twiml = response.toXml();
-
-        // TwiML XML 문자열을 Twiml 객체로 감싸기
-        com.twilio.type.Twiml twimlObject = new com.twilio.type.Twiml(twiml);
-
-        // Twiml 객체를 사용하여 전화 걸기
-        Call call = Call.creator(
-                new com.twilio.type.PhoneNumber(to),
-                new com.twilio.type.PhoneNumber(from),
-                twimlObject
-        ).create();
-
-        log.info("Twilio Call SID: {}", call.getSid());
     }
 
 

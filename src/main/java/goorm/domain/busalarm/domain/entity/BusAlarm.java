@@ -59,4 +59,8 @@ public class BusAlarm {
     public void deactivateIsAlarmFlag() {
         this.isAlarmFlag = false;
     }
+
+    public void updateAlarmRemaining() {
+        this.alarmRemaining -= 1;
+    }
 }
