@@ -1,8 +1,8 @@
 package goorm.global.config;
 
 
-import goorm.domain.oauth2.infra.filter.GoormBusJWTFilter;
-import goorm.domain.oauth2.infra.filter.GoormBusLogoutFilter;
+import goorm.global.infra.filter.GoormBusJWTFilter;
+import goorm.global.infra.filter.GoormBusLogoutFilter;
 import goorm.global.infra.exception.auth.GoormBusAuthExceptionFilter;
 import goorm.global.jwt.domain.repository.JsonWebTokenRepository;
 import goorm.global.jwt.domain.repository.KakaoJsonWebTokenRepository;
