@@ -3,7 +3,7 @@ package goorm.domain.buslog.presentation.controller;
 import goorm.domain.buslog.domain.entity.BusLog;
 import goorm.domain.buslog.presentation.dto.request.AlarmReq;
 import goorm.domain.buslog.presentation.dto.request.NoteFavoriteRequest;
-import goorm.domain.buslog.presentation.dto.request.NoteRequest;
+import goorm.domain.buslog.presentation.dto.request.BusLogSaveReq;
 import goorm.domain.buslog.presentation.dto.response.BusLogAllRes;
 import goorm.domain.buslog.domain.repository.BusLogRepository;
 import goorm.domain.buslog.application.service.BusLogServiceImpl;
@@ -37,7 +37,7 @@ public class BusLogController {
 
     @Operation(summary = "버스 데이터 정보들이 쭉 넘어옴 여기서 전화 콜 및 일시 저장해줘야됨 즉 즐격찾기 false")
     @PostMapping("/save")
-    public ResponseEntity<Void> saveBusLog(@Valid @RequestBody NoteRequest req,
+    public ResponseEntity<Void> saveBusLog(@Valid @RequestBody BusLogSaveReq req,
                                        @AuthenticationPrincipal String userId) {
 
         busLogServiceImpl.save(req, userId);

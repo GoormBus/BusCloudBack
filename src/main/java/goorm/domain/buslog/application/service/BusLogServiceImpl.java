@@ -8,7 +8,7 @@ import goorm.domain.buslog.domain.entity.BusLog;
 import goorm.domain.buslog.domain.repository.BusFavoriteRepository;
 import goorm.domain.member.domain.entity.Member;
 import goorm.domain.member.domain.repository.MemberRepository;
-import goorm.domain.buslog.presentation.dto.request.NoteRequest;
+import goorm.domain.buslog.presentation.dto.request.BusLogSaveReq;
 import goorm.domain.buslog.presentation.dto.response.BusLogAllRes;
 import goorm.domain.buslog.domain.repository.BusLogRepository;
 import goorm.global.infra.exception.error.ErrorCode;
@@ -38,7 +38,7 @@ public class BusLogServiceImpl {
 
     private final StationService stationService;
 
-    public void save(NoteRequest req, String userId){
+    public void save(BusLogSaveReq req, String userId){
 
         Member findMember = memberRepository.findById(userId).orElse(null);
         if(findMember == null) throw new GoormBusException(ErrorCode.USER_NOT_EXIST);

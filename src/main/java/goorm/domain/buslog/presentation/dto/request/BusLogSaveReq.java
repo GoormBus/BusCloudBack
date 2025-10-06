@@ -3,7 +3,7 @@ package goorm.domain.buslog.presentation.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 
-public record NoteRequest(
+public record BusLogSaveReq(
 
         @NotBlank
         @Schema(description = "출발지", example = "제주공항")
