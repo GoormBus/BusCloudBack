@@ -40,8 +40,8 @@ public class StationService {
     private final JejuBusClient jejuBusClient;
     private final BusAlarmRepository busAlarmRepository;
 
-    private String accountSid="AC6daasdf7c0729c";
-    private String authToken="4d";
+    private String accountSid = "AC6daasdf7c0729c";
+    private String authToken = "4d";
 
 
     // 30초마다 실행되는 메서드 - 사용자별로 독립적으로 동작
@@ -50,73 +50,34 @@ public class StationService {
         List<BusLog> findBusLogAll = busLogRepository.findAll();
         for (BusLog busLog : findBusLogAll) {
             BusAlarm findBusAlarm = busAlarmRepository.findByBusLog(busLog).orElse(null);
-            if(findBusAlarm==null) throw new GoormBusException(ErrorCode.BUS_ALARM_NOT_EXIST);
+            if (findBusAlarm == null) throw new GoormBusException(ErrorCode.BUS_ALARM_NOT_EXIST);
 
             // 비활성화 일떄 건너뛰기
-            if(!findBusAlarm.isAlarmFlag()) continue;
+            if (!findBusAlarm.isAlarmFlag()) continue;
 
             // 잔여 횟수가 0일떄 건너뛰기
-            if(findBusAlarm.getAlarmRemaining() == 0L) continue;
-            ArrivalResponse arrivalInfo = jejuBusClient.getArrivalInfo(busLog.getStationId());
+            if (findBusAlarm.getAlarmRemaining() == 0L) continue;
 
 
+            checkBusArrivalAndNotify(busLog);
         }
-        userStationIdMap.forEach((userId, stationId) -> {
-            String busId = userBusIdMap.get(userId);
-            Integer station = userStationMap.get(userId);
-            Boolean stopCalling = userStopCallingMap.getOrDefault(userId, true);
-            AtomicInteger cnt = userCntMap.getOrDefault(userId, new AtomicInteger(0));
-            Set<Integer> seenBuses = userSeenBusesMap.getOrDefault(userId, new HashSet<>());
 
-            if (stationId != null && !stopCalling) {
-                String url = "https://bus.jeju.go.kr/api/searchArrivalInfoList.do?station_id=" + stationId;
-                ResponseEntity<BusInfo[]> response = restTemplate.getForEntity(url, BusInfo[].class);
-                BusInfo[] buses = response.getBody();
-                log.info("Twilio Account SID: {}", accountSid);
-                log.info("Twilio Auth Token: {}", authToken);
+    }
 
-                if (buses != null) {
-                    log.info("API 응답 데이터: {}", Arrays.toString(buses));
-                    log.info("현재 {} 사용자의 cnt 값: {}", userId, cnt);
+    private void checkBusArrivalAndNotify(BusLog busLog) {
+        ArrivalResponse response = jejuBusClient.getArrivalInfo(busLog.getStationId());
+        if (response == null || response.getResultList() == null) {
+            throw new GoormBusException(ErrorCode.JEJU_RESPONSE_NOT_EXIST);
+        }
 
-                    Arrays.stream(buses)
-                            .filter(bus -> busId.equals(bus.getRouteNum()) && bus.getRemainStation() == station)
-                            .forEach(bus -> {
-                                if (!seenBuses.contains(bus.getVhId())) {
-                                    log.info("{} 사용자에게 조건을 만족하는 새로운 버스를 찾았습니다: {}", userId, bus);
-                                    seenBuses.add(bus.getVhId());
-                                    cnt.incrementAndGet();  // 새로운 버스일 경우 카운터 증가
-                                    userCntMap.put(userId, cnt);
-                                    log.info("현재 {} 사용자의 cnt 값: {}", userId, cnt);
-                                    Optional<Member> byPhone = memberRepository.findByPhone2(userId);
-                                    if (byPhone.isPresent()) {
-                                        Member member = byPhone.get();
-                                        bus_call(member);
-                                        // member에 대한 로직 처리
-                                    } else {
-                                        // 값이 없을 때의 처리 로직
-                                        throw new NoSuchElementException("해당하는 사용자가 없습니다.");
-                                    }
 
-                                    if (cnt.get() >= 2) {
-                                        log.info("{} 사용자의 cnt가 2에 도달하여 호출을 중단합니다.", userId);
-                                        userStopCallingMap.put(userId, true);
-                                    }
-                                } else {
-                                    log.info("{} 사용자는 이미 확인된 버스입니다: {}", userId, bus.getVhId());
-                                }
-                            });
+        response.getResultList().forEach(arrival -> {
+            int remainStation = Integer.parseInt(arrival.getRemainStation());
+            int busLogStation = Integer.parseInt(String.valueOf(busLog.getStation()));
 
-                    if (cnt.get() < 2) {
-                        log.info("{} 사용자에게 조건을 만족하는 새로운 버스를 찾지 못했습니다.", userId);
-                    }
-                } else {
-                    log.warn("API 응답에서 버스 데이터가 비어 있습니다.");
-                }
+            // 잔여랑 api response 응답값이랑 똑같을때 알림콜 호출
+            if (remainStation == busLogStation) {
 
-                // 상태 업데이트
-                userSeenBusesMap.put(userId, seenBuses);
-                userCntMap.put(userId, cnt);
             }
         });
     }
@@ -155,7 +116,6 @@ public class StationService {
 
         log.info("Twilio Call SID: {}", call.getSid());
     }
-
 
 
 }
