@@ -2,6 +2,7 @@ package goorm.domain.buslog.presentation.controller;
 
 import goorm.domain.buslog.domain.entity.BusLog;
 import goorm.domain.buslog.presentation.dto.request.AlarmReq;
+import goorm.domain.buslog.presentation.dto.request.BusFavoriteReq;
 import goorm.domain.buslog.presentation.dto.request.NoteFavoriteRequest;
 import goorm.domain.buslog.presentation.dto.request.BusLogSaveReq;
 import goorm.domain.buslog.presentation.dto.response.BusLogAllRes;
@@ -40,7 +41,7 @@ public class BusLogController {
     public ResponseEntity<Void> saveBusLog(@Valid @RequestBody BusLogSaveReq req,
                                        @AuthenticationPrincipal String userId) {
 
-        busLogServiceImpl.save(req, userId);
+        busLogServiceImpl.postBusLogSave(req, userId);
 
 
         String stationId = req.stationId();
@@ -61,31 +62,16 @@ public class BusLogController {
     @GetMapping("/list")
     @Operation(summary = "즐겨찾기 버스 기록 저장 보여주기")
     public ResponseEntity<List<BusLogAllRes>> getBusLogAll(@AuthenticationPrincipal String userId) {
-        return ResponseEntity.ok(busLogServiceImpl.findAll(userId));
+        return ResponseEntity.ok(busLogServiceImpl.getBusLogAll(userId));
     }
 
 
 
     @PostMapping("/favorite")
     @Operation(summary = "즐겨 찾기 API")
-    public ResponseEntity<String> delete(@Valid @RequestBody NoteFavoriteRequest req) {
-        Optional<BusLog> findNote = noteRepository.findById(req.id());
-        if (findNote.isPresent()) {
-            BusLog busLog = findNote.get();
-            if (req.favorite()) {
-                noteRepository.updelete(req, 2);
-            } else {
-                if (busLog.getFavorite_pre() != 1) {
-                    noteRepository.delete(req);
-                }
-            }
-
-        } else {
-            // 값이 없을 때의 처리 로직
-            throw new NoSuchElementException("해당하는 사용자가 없습니다.");
-        }
-        // 즉시 응답 반환
-        return ResponseEntity.ok("설정 완료");
+    public ResponseEntity<Void> updateBusFavorite(@Valid @RequestBody BusFavoriteReq req) {
+        busLogServiceImpl.updateBusFavorite(req);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/alarm")

@@ -6,6 +6,7 @@ import goorm.domain.busalarm.domain.repository.BusAlarmRepository;
 import goorm.domain.buslog.domain.entity.BusFavorite;
 import goorm.domain.buslog.domain.entity.BusLog;
 import goorm.domain.buslog.domain.repository.BusFavoriteRepository;
+import goorm.domain.buslog.presentation.dto.request.BusFavoriteReq;
 import goorm.domain.member.domain.entity.Member;
 import goorm.domain.member.domain.repository.MemberRepository;
 import goorm.domain.buslog.presentation.dto.request.BusLogSaveReq;
@@ -38,7 +39,7 @@ public class BusLogServiceImpl {
 
     private final StationService stationService;
 
-    public void save(BusLogSaveReq req, String userId){
+    public void postBusLogSave(BusLogSaveReq req, String userId){
 
         Member findMember = memberRepository.findById(userId).orElse(null);
         if(findMember == null) throw new GoormBusException(ErrorCode.USER_NOT_EXIST);
@@ -54,7 +55,7 @@ public class BusLogServiceImpl {
 
         busLogRepository.save(newBusLog);
     }
-    public List<BusLogAllRes> findAll(String memberId) {
+    public List<BusLogAllRes> getBusLogAll(String memberId) {
         Member findMember = memberRepository.findById(memberId).orElse(null);
         if(findMember == null) throw new GoormBusException(ErrorCode.USER_NOT_EXIST);
 
@@ -73,6 +74,19 @@ public class BusLogServiceImpl {
 
         return result;
     }
+
+    public void updateBusFavorite(BusFavoriteReq req){
+        BusLog findBusLog = busLogRepository.findById(req.busLogId()).orElse(null);
+        if(findBusLog == null) throw new GoormBusException(ErrorCode.BUS_LOG_NOT_EXIST);
+
+        BusFavorite findBusFavorite = busFavoriteRepository.findByBusLog(findBusLog).orElse(null);
+        if(findBusFavorite==null) throw new GoormBusException(ErrorCode.BUS_FAVORITE_NOT_EXIST);
+
+        if(findBusFavorite.isFavoriteFlag()) findBusFavorite.deactivateIsFavoriteFlag();
+        else findBusFavorite.activateIsFavoriteFlag();
+
+    }
+
 
 
     // 매일 자정에 실행 최대 빈도수 1씩 증가

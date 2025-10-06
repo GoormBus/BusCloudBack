@@ -50,6 +50,7 @@ public enum ErrorCode {
     USER_EXIST(-212, "존재하는 유저입니다.", 404),
 
     // bus
+    BUS_LOG_NOT_EXIST(-300, "존재하지 않는 버스 기록입니다.", 404),
     BUS_ALARM_NOT_EXIST(-300, "존재하지 않는 버스 알림입니다.", 404),
     BUS_FAVORITE_NOT_EXIST(-301, "존재하지 않는 버스 즐겨찾기입니다.", 404),
 
