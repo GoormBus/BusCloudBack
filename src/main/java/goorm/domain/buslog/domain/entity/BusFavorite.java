@@ -3,6 +3,7 @@ package goorm.domain.buslog.domain.entity;
 import goorm.domain.member.domain.entity.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -31,6 +32,12 @@ public class BusFavorite {
     @CreationTimestamp
     @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    @Builder
+    public BusFavorite(BusLog busLog){
+        this.busLog = busLog;
+        this.isFavoriteFlag = true; // true로 초기화
+    }
 
 
     public void activateIsFavoriteFlag() {

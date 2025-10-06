@@ -43,7 +43,7 @@ public class BusLogServiceImpl implements BusLogService {
     private final BusFavoriteRepository busFavoriteRepository;
     private final BusAlarmRepository busAlarmRepository;
     private final MemberRepository memberRepository;
-    private final StationService stationService;
+
 
     /**
      * 🪧 버스 로그 저장
@@ -63,7 +63,7 @@ public class BusLogServiceImpl implements BusLogService {
         if (findMember == null)
             throw new GoormBusException(ErrorCode.USER_NOT_EXIST);
 
-        BusLog newBusLog = BusLog.builder()
+        BusLog busLog = BusLog.builder()
                 .member(findMember)
                 .departure(req.departure())
                 .destination(req.destination())
@@ -72,7 +72,16 @@ public class BusLogServiceImpl implements BusLogService {
                 .stationId(req.stationId())
                 .build();
 
-        busLogRepository.save(newBusLog);
+        BusAlarm busAlarm = BusAlarm.builder()
+                .busLog(busLog)
+                .build();
+
+        BusFavorite busFavorite = BusFavorite.builder()
+                .busLog(busLog)
+                .build();
+        busLogRepository.save(busLog);
+        busFavoriteRepository.save(busFavorite);
+        busAlarmRepository.save(busAlarm);
     }
 
     /**
