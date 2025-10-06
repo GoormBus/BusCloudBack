@@ -4,7 +4,7 @@ import goorm.domain.buslog.domain.entity.BusLog;
 import goorm.domain.buslog.presentation.dto.request.AlarmReq;
 import goorm.domain.buslog.presentation.dto.request.NoteFavoriteRequest;
 import goorm.domain.buslog.presentation.dto.request.NoteRequest;
-import goorm.domain.buslog.presentation.dto.response.NoteResponse;
+import goorm.domain.buslog.presentation.dto.response.BusLogAllRes;
 import goorm.domain.buslog.domain.repository.BusLogRepository;
 import goorm.domain.buslog.application.service.BusLogServiceImpl;
 import goorm.domain.buslog.application.service.StationService;
@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -25,7 +26,7 @@ import java.util.Optional;
 @Tag(name = "사용자의 버스 기록 정보")
 @RequestMapping("/api/bus")
 @Slf4j
-public class NoteController {
+public class BusLogController {
 
     private final BusLogServiceImpl busLogServiceImpl;
 
@@ -36,7 +37,7 @@ public class NoteController {
 
     @Operation(summary = "버스 데이터 정보들이 쭉 넘어옴 여기서 전화 콜 및 일시 저장해줘야됨 즉 즐격찾기 false")
     @PostMapping("/save")
-    public ResponseEntity<Void> create(@Valid @RequestBody NoteRequest req,
+    public ResponseEntity<Void> saveBusLog(@Valid @RequestBody NoteRequest req,
                                        @AuthenticationPrincipal String userId) {
 
         busLogServiceImpl.save(req, userId);
@@ -59,9 +60,8 @@ public class NoteController {
 
     @GetMapping("/list")
     @Operation(summary = "즐겨찾기 버스 기록 저장 보여주기")
-    public SuccessResponse<ListResult<NoteResponse>> readAll(@RequestAttribute("id") String userId) {
-        ListResult<NoteResponse> note = busLogServiceImpl.findAll(userId);
-        return SuccessResponse.ok(note);
+    public ResponseEntity<List<BusLogAllRes>> getBusLogAll(@AuthenticationPrincipal String userId) {
+        return ResponseEntity.ok(busLogServiceImpl.findAll(userId));
     }
 
 

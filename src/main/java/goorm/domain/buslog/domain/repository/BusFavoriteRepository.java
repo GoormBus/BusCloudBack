@@ -1,19 +1,18 @@
 package goorm.domain.buslog.domain.repository;
 
+import goorm.domain.busalarm.domain.entity.BusAlarm;
+import goorm.domain.buslog.domain.entity.BusFavorite;
 import goorm.domain.buslog.domain.entity.BusLog;
 import goorm.domain.member.domain.entity.Member;
-import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Repository
-public interface BusLogRepository extends JpaRepository<BusLog, Long> {
+public interface BusFavoriteRepository extends JpaRepository<BusFavorite, Long> {
 
-    List<BusLog> findByMember(Member member);
-
+    Optional<BusFavorite> findByBusLog(BusLog busLog);
 }

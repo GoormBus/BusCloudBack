@@ -1,11 +1,15 @@
 package goorm.domain.buslog.application.service;
 
 
+import goorm.domain.busalarm.domain.entity.BusAlarm;
+import goorm.domain.busalarm.domain.repository.BusAlarmRepository;
+import goorm.domain.buslog.domain.entity.BusFavorite;
 import goorm.domain.buslog.domain.entity.BusLog;
+import goorm.domain.buslog.domain.repository.BusFavoriteRepository;
 import goorm.domain.member.domain.entity.Member;
 import goorm.domain.member.domain.repository.MemberRepository;
 import goorm.domain.buslog.presentation.dto.request.NoteRequest;
-import goorm.domain.buslog.presentation.dto.response.NoteResponse;
+import goorm.domain.buslog.presentation.dto.response.BusLogAllRes;
 import goorm.domain.buslog.domain.repository.BusLogRepository;
 import goorm.global.infra.exception.error.ErrorCode;
 import goorm.global.infra.exception.error.GoormBusException;
@@ -16,6 +20,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalTime;
 
@@ -26,6 +31,8 @@ import java.time.LocalTime;
 public class BusLogServiceImpl {
 
     private final BusLogRepository busLogRepository;
+    private final BusFavoriteRepository busFavoriteRepository;
+    private final BusAlarmRepository busAlarmRepository;
 
     private final MemberRepository memberRepository;
 
@@ -46,12 +53,25 @@ public class BusLogServiceImpl {
                 .build();
 
         busLogRepository.save(newBusLog);
-
     }
-    public ListResult<NoteResponse> findAll(String memberId) {
-        List<BusLog> busLogs = noteRepository.findAll(memberId);
-        List<NoteResponse> list = busLogs.stream().map(NoteResponse::of).toList();
-        return ResponseService.getListResult(list);
+    public List<BusLogAllRes> findAll(String memberId) {
+        Member findMember = memberRepository.findById(memberId).orElse(null);
+        if(findMember == null) throw new GoormBusException(ErrorCode.USER_NOT_EXIST);
+
+        List<BusLogAllRes> result = new ArrayList<>();
+        List<BusLog> busLogs = busLogRepository.findByMember(findMember);
+
+        for (BusLog busLog : busLogs) {
+            BusAlarm findBusAlarm = busAlarmRepository.findByBusLog(busLog).orElse(null);
+            if(findBusAlarm==null) throw new GoormBusException(ErrorCode.BUS_ALARM_NOT_EXIST);
+
+            BusFavorite findBusFavorite = busFavoriteRepository.findByBusLog(busLog).orElse(null);
+            if(findBusFavorite==null) throw new GoormBusException(ErrorCode.BUS_FAVORITE_NOT_EXIST);
+
+            result.add(BusLogAllRes.of(busLog, findBusAlarm.isAlarmFlag(), findBusFavorite.isFavoriteFlag()));
+        }
+
+        return result;
     }
 
 
