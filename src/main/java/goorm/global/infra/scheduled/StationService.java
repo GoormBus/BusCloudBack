@@ -13,6 +13,8 @@ import goorm.domain.member.domain.entity.Member;
 import goorm.domain.member.domain.repository.MemberRepository;
 import goorm.global.infra.exception.error.ErrorCode;
 import goorm.global.infra.exception.error.GoormBusException;
+import goorm.global.infra.feignclient.JejuBusClient;
+import goorm.global.infra.feignclient.dto.ArrivalResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class StationService {
     private final MemberRepository memberRepository;
     private final BusLogRepository busLogRepository;
+    private final JejuBusClient jejuBusClient;
     private final BusAlarmRepository busAlarmRepository;
 
     private String accountSid="AC6daasdf7c0729c";
@@ -54,6 +57,8 @@ public class StationService {
 
             // 잔여 횟수가 0일떄 건너뛰기
             if(findBusAlarm.getAlarmRemaining() == 0L) continue;
+            ArrivalResponse arrivalInfo = jejuBusClient.getArrivalInfo(busLog.getStationId());
+
 
         }
         userStationIdMap.forEach((userId, stationId) -> {
