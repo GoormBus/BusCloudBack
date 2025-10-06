@@ -28,31 +28,13 @@ public class BusLogController {
 
     private final BusLogService busLogService;
 
-    private final StationService stationService;
-
-    private final BusLogRepository noteRepository;
-
 
     @Operation(summary = "버스 데이터 정보들이 쭉 넘어옴 여기서 전화 콜 및 일시 저장해줘야됨 즉 즐격찾기 false")
     @PostMapping
     public ResponseEntity<Void> saveBusLog(@Valid @RequestBody BusLogSaveReq req,
-                                       @AuthenticationPrincipal String userId) {
-
+                                           @AuthenticationPrincipal String userId) {
         busLogService.postBusLogSave(req, userId);
-
-
-        String stationId = req.stationId();
-        int station = req.station();
-        String busId = req.notionId();
-        // 5초마다 API 호출 시작
-        stationService.scheduleBusApiCall(userId, busId, stationId, station);
-
-        // BusLog 객체를 NoteSaveResponse로 변환
-        NoteSaveResponse response = NoteSaveResponse.of(note.getData());
-
-        // 변환된 NoteSaveResponse를 응답으로 반환
-        return SuccessResponse.ok(response);
-        // 즉시 note 객체 응답 반환
+        return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "즐겨찾기 버스 기록 저장들 보여주기")
@@ -68,7 +50,6 @@ public class BusLogController {
         busLogService.updateBusFavorite(req);
         return ResponseEntity.ok().build();
     }
-
 
 
 }
