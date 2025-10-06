@@ -30,8 +30,6 @@ jwt:
   access-expiration: ${JWT_ACCESS_EXPIRATION}
   refresh-expiration: ${JWT_REFRESH_EXPIRATION}
 
-
-
 logging:
   level:
     root: INFO
@@ -40,20 +38,14 @@ logging:
         web: ERROR
 
 
-
-
-openai:
-  api:
-    url: https://api.openai.com
-    key: ${OPENAI_API_KEY}
-  text:
-    model: gpt-4-turbo-preview
-
-
-
 feign:
   client:
     config:
       default:
         connectTimeout: 3000
         readTimeout: 3000
+
+twilio:
+  account-sid: ${TWILIO_ACCOUNT_SID}
+  auth-token: ${TWILIO_AUTH_TOKEN}
+  from-number: ${FROM_NUMBER}

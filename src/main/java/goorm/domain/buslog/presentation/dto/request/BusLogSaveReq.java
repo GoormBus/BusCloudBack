@@ -3,6 +3,15 @@ package goorm.domain.buslog.presentation.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 
+/**
+ * 📝 BusLogSaveReq
+ *
+ * <p>버스 이용 기록을 새로 저장할 때 사용하는 요청 DTO입니다.</p>
+ * <ul>
+ *     <li>출발지와 도착지 정보</li>
+ *     <li>정류장 ID 및 노선 ID 포함</li>
+ * </ul>
+ */
 public record BusLogSaveReq(
 
         @NotBlank
@@ -14,7 +23,7 @@ public record BusLogSaveReq(
         String destination,
 
         @NotBlank
-        @Schema(description = "정류장 전", example = "3")
+        @Schema(description = "설정한 정류장 수", example = "3")
         Long station,
 
         @NotBlank
@@ -22,11 +31,7 @@ public record BusLogSaveReq(
         String stationId,
 
         @NotBlank
-        @Schema(description = "노선 즉 버스ID ", example = "110")
+        @Schema(description = "노선 ID (버스 번호)", example = "110")
         String notionId
 
-
-
-
-) {
-}
+) { }

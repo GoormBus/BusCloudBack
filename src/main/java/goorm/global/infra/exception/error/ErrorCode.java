@@ -51,14 +51,11 @@ public enum ErrorCode {
 
     // bus
     BUS_LOG_NOT_EXIST(-300, "존재하지 않는 버스 기록입니다.", 404),
-    BUS_ALARM_NOT_EXIST(-300, "존재하지 않는 버스 알림입니다.", 404),
-    BUS_FAVORITE_NOT_EXIST(-301, "존재하지 않는 버스 즐겨찾기입니다.", 404),
+    BUS_ALARM_NOT_EXIST(-301, "존재하지 않는 버스 알림입니다.", 404),
+    BUS_FAVORITE_NOT_EXIST(-302, "존재하지 않는 버스 즐겨찾기입니다.", 404),
 
-    // food
-
-
-    // openAI
-    OPENAI_NOT_EXIST(-500, "내용을 생성할 수 없습니다.", 500);
+    // JejuAPI
+    JEJU_RESPONSE_NOT_EXIST(-400, "제주 API 응답값이 없습니다.", 500);
 
 
     private final int code;
