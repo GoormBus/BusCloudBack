@@ -48,7 +48,6 @@ public class BusAlarmController {
     @PostMapping
     public ResponseEntity<Void> updateBusAlarm(@Valid @RequestBody BusAlarmReq req) {
         busAlarmService.updateBusAlarm(req);
-        log.info("버스 알림 상태 변경 요청 처리 완료: busLogId={}", req.busLogId());
         return ResponseEntity.ok().build();
     }
 }
