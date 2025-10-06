@@ -31,7 +31,6 @@ dependencyManagement {
 	}
 }
 dependencies {
-	implementation 'com.twilio.sdk:twilio:9.13.0'
 
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
@@ -40,7 +39,7 @@ dependencies {
 	implementation 'org.jsoup:jsoup:1.16.1'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
-
+	implementation 'com.twilio.sdk:twilio:9.13.0'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
