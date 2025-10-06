@@ -17,7 +17,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @DynamicUpdate
-@Table(name="버스 기록")
 public class BusLog {
 
     @Id

@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @DynamicUpdate
-@Table(name = "버스 기록 즐겨찾기")
 public class BusFavorite {
 
     @Id
