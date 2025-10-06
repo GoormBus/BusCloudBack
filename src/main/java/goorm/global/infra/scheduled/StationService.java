@@ -1,12 +1,18 @@
-package goorm.domain.busalarm.application.service.scheduled;
+package goorm.global.infra.scheduled;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Call;
 import com.twilio.twiml.VoiceResponse;
 import com.twilio.twiml.voice.Say;
+import goorm.domain.busalarm.domain.entity.BusAlarm;
+import goorm.domain.busalarm.domain.repository.BusAlarmRepository;
+import goorm.domain.buslog.domain.entity.BusLog;
+import goorm.domain.buslog.domain.repository.BusLogRepository;
 import goorm.domain.member.domain.entity.Member;
 import goorm.domain.member.domain.repository.MemberRepository;
+import goorm.global.infra.exception.error.ErrorCode;
+import goorm.global.infra.exception.error.GoormBusException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -28,44 +34,28 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RequiredArgsConstructor
 public class StationService {
     private final MemberRepository memberRepository;
-
-    private final RestTemplate restTemplate = new RestTemplate();
-
-    // 사용자별 상태를 저장하기 위한 Map
-    private final Map<String, String> userBusIdMap = new ConcurrentHashMap<>();
-    private final Map<String, String> userStationIdMap = new ConcurrentHashMap<>();
-    private final Map<String, Integer> userStationMap = new ConcurrentHashMap<>();
-    private final Map<String, Boolean> userStopCallingMap = new ConcurrentHashMap<>();
-    private final Map<String, AtomicInteger> userCntMap = new ConcurrentHashMap<>();
-    private final Map<String, Set<Integer>> userSeenBusesMap = new ConcurrentHashMap<>();
-    private static final long RUNNING_DURATION_HOURS = 3; // 3시간
-    private final LocalDateTime startTime = LocalDateTime.now();
+    private final BusLogRepository busLogRepository;
+    private final BusAlarmRepository busAlarmRepository;
 
     private String accountSid="AC6daasdf7c0729c";
-
-
     private String authToken="4d";
 
-    // 사용자별 API 호출 상태 설정 메서드
-    @Async
-    public void scheduleBusApiCall(String userId, String busId, String stationId, int station) {
-        userBusIdMap.put(userId, busId);
-        userStationIdMap.put(userId, stationId);
-        userStationMap.put(userId, station);
-        userStopCallingMap.put(userId, false);  // 호출 중단 플래그 초기화
-        userSeenBusesMap.put(userId, new HashSet<>());  // 중복 체크 목록 초기화
-        userCntMap.put(userId, new AtomicInteger(0));  // 카운터 초기화
-    }
 
-    // 5초마다 실행되는 메서드 - 사용자별로 독립적으로 동작
-    @Scheduled(fixedRate = 5000)
-    public void callBusApi() {
-        // 현재 시간이 시작 시간으로부터 3시간 경과했는지 확인
-        if (ChronoUnit.HOURS.between(startTime, LocalDateTime.now()) >= RUNNING_DURATION_HOURS) {
-            log.info("3시간이 경과하여 스케줄링을 중단합니다.");
-            return;  // 스케줄링 중단
+    // 30초마다 실행되는 메서드 - 사용자별로 독립적으로 동작
+    @Scheduled(fixedRate = 30000)
+    public void callBusScheduler() {
+        List<BusLog> findBusLogAll = busLogRepository.findAll();
+        for (BusLog busLog : findBusLogAll) {
+            BusAlarm findBusAlarm = busAlarmRepository.findByBusLog(busLog).orElse(null);
+            if(findBusAlarm==null) throw new GoormBusException(ErrorCode.BUS_ALARM_NOT_EXIST);
+
+            // 비활성화 일떄 건너뛰기
+            if(!findBusAlarm.isAlarmFlag()) continue;
+
+            // 잔여 횟수가 0일떄 건너뛰기
+            if(findBusAlarm.getAlarmRemaining() == 0L) continue;
+
         }
-
         userStationIdMap.forEach((userId, stationId) -> {
             String busId = userBusIdMap.get(userId);
             Integer station = userStationMap.get(userId);

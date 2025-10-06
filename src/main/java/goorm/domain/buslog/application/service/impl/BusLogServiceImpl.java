@@ -4,7 +4,7 @@ package goorm.domain.buslog.application.service.impl;
 import goorm.domain.busalarm.domain.entity.BusAlarm;
 import goorm.domain.busalarm.domain.repository.BusAlarmRepository;
 import goorm.domain.buslog.application.service.BusLogService;
-import goorm.domain.busalarm.application.service.scheduled.StationService;
+import goorm.global.infra.scheduled.StationService;
 import goorm.domain.buslog.domain.entity.BusFavorite;
 import goorm.domain.buslog.domain.entity.BusLog;
 import goorm.domain.buslog.domain.repository.BusFavoriteRepository;
