@@ -32,10 +32,6 @@ public class BusAlarm {
     @Column(nullable = false)
     private boolean isAlarmFlag;
 
-    @Comment("얘는 뭐지..")
-    @Column(nullable = false)
-    private boolean isExecuteFlag; // 매일 실행 알림때문에
-
     @Comment("알림 잔여 횟수, 초기는 2로 고정")
     @Column(nullable = false)
     private Long alarmRemaining;
@@ -48,7 +44,6 @@ public class BusAlarm {
     public BusAlarm(BusLog busLog) {
         this.busLog = busLog;
         this.isAlarmFlag = true;
-        this.isExecuteFlag = true;
         this.alarmRemaining = 2L;
     }
 
@@ -60,7 +55,11 @@ public class BusAlarm {
         this.isAlarmFlag = false;
     }
 
-    public void updateAlarmRemaining() {
+    public void minusAlarmRemaining() {
         this.alarmRemaining -= 1;
+    }
+
+    public void initAlarmRemaining() {
+        this.alarmRemaining = 2L;
     }
 }

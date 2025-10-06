@@ -16,6 +16,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -29,7 +31,7 @@ public class StationService {
     private final BusAlarmService busAlarmService;
 
 
-    // 30초마다 실행되는 메서드 - 사용자별로 독립적으로 동작
+    // 30초마다 알림콜 실행되는 메서드 - 버스 로그별로 독립적으로 동작
     @Scheduled(fixedRate = 30000)
     public void callBusScheduler() {
         List<BusLog> findBusLogAll = busLogRepository.findAll();
@@ -46,8 +48,28 @@ public class StationService {
 
             checkBusArrivalAndNotify(busLog, findBusAlarm);
         }
-
     }
+
+    // 버스 로그 생성된 기준으로 24시간 지나면 알림 잔여 횟수 2로 초기화
+    @Scheduled(fixedRate = 60000)
+    public void reactivateBusNotification() {
+        List<BusLog> findBusLogAll = busLogRepository.findAll();
+        for (BusLog busLog : findBusLogAll) {
+            BusAlarm findBusAlarm = busAlarmRepository.findByBusLog(busLog).orElse(null);
+            if (findBusAlarm == null) throw new GoormBusException(ErrorCode.BUS_ALARM_NOT_EXIST);
+
+            LocalDateTime createdAt = findBusAlarm.getCreatedAt();
+            LocalDateTime now = LocalDateTime.now();
+
+            // 24시간 이상 지났는지 확인
+            if (Duration.between(createdAt, now).toHours() >= 24) {
+                if (findBusAlarm.getAlarmRemaining() < 2) {
+                    findBusAlarm.initAlarmRemaining();
+                }
+            }
+        }
+    }
+
 
     private void checkBusArrivalAndNotify(BusLog busLog, BusAlarm busAlarm) {
         ArrivalResponse response = jejuBusClient.getArrivalInfo(busLog.getStationId());
@@ -62,7 +84,7 @@ public class StationService {
 
             // 잔여랑 api response 응답값이랑 똑같을때 알림콜 호출
             if (remainStation == busLogStation) {
-                busAlarm.updateAlarmRemaining(); // -1 씩 감소
+                busAlarm.minusAlarmRemaining(); // -1 씩 감소
                 busAlarmService.sendBusArrivalVoiceNotification(busLog.getMember(), busLog);
             }
         });
