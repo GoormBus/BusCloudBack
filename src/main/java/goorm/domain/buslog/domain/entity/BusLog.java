@@ -18,10 +18,10 @@ import java.util.List;
 @AllArgsConstructor
 @DynamicUpdate
 @Table(
-        name = "bus_log"
-//        indexes = {
-//                @Index(name = "idx_member_id", columnList = "member_id")
-//        }
+        name = "bus_log",
+        indexes = {
+                @Index(name = "idx_member_id", columnList = "member_id")
+        }
 )
 public class BusLog {
 
