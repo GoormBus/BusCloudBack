@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
-//@Component
+@Component
 @RequiredArgsConstructor
 @Slf4j
 public class BusLogDataInitializer {
@@ -76,8 +76,8 @@ public class BusLogDataInitializer {
     public void initializeBusLogsV2() {
         log.info("🚀 더미 데이터 초기화 시작");
 
-        int totalMembers = 50;
-        int logsPerMember = 50;
+        int totalMembers = 100;
+        int logsPerMember = 100;
 
         for (int m = 1; m <= totalMembers; m++) {
             // 회원 생성

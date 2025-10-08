@@ -57,8 +57,8 @@ public class BusLogController {
             @ApiResponse(responseCode = "500", description = "서버 내부 오류")
     })
     @GetMapping
-    public ResponseEntity<List<BusLogAllRes>> getBusLogAll(@AuthenticationPrincipal String userId) {
-        return ResponseEntity.ok(busLogService.getBusLogAll(userId));
+    public ResponseEntity<List<BusLogAllRes>> getBusLogAll(@RequestParam String memberId,@AuthenticationPrincipal String userId) {
+        return ResponseEntity.ok(busLogService.getBusLogAll(memberId));
     }
 
     /**

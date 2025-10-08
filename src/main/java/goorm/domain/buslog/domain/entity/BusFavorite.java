@@ -17,10 +17,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @DynamicUpdate
 @Table(
-        name = "bus_favorite",
-        indexes = {
-                @Index(name = "idx_bus_log_id", columnList = "bus_log_id")
-        }
+        name = "bus_favorite"
+//        indexes = {
+//                @Index(name = "idx_bus_log_id", columnList = "bus_log_id")
+//        }
 )
 public class BusFavorite {
 
