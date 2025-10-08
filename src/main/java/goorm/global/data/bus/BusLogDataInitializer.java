@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
-//@Component
+@Component
 @RequiredArgsConstructor
 @Slf4j
 public class BusLogDataInitializer {
@@ -28,10 +28,10 @@ public class BusLogDataInitializer {
     private final BusAlarmRepository busAlarmRepository;
     private final MemberRepository memberRepository;
 
-    @PostConstruct
-    @Transactional
-    public void initializeBusLogs() {
-        Member findMember = memberRepository.findById("6bb60da0-f7bf-4da0-80c2-249d7cd21973")
+    //@PostConstruct
+    //@Transactional
+    public void initializeBusLogsV1() {
+        Member findMember = memberRepository.findById("ea45ebca-ce2a-4abe-8b8c-470699637be5")
                 .orElseThrow(() -> new GoormBusException(ErrorCode.USER_NOT_EXIST));
         log.info("🚍 BusLog 데이터 초기화 시작");
         for (int i = 0; i < 10000; i++) {
@@ -64,9 +64,59 @@ public class BusLogDataInitializer {
             busFavoriteRepository.save(busFavorite);
             busAlarmRepository.save(busAlarm);
 
-            if (i % 1000 == 0) {
+            if (i % 100 == 0) {
                 log.info("✅ {}개 데이터 삽입 완료", i);
             }
+        }
+
+    }
+
+    @PostConstruct
+    @Transactional
+    public void initializeBusLogsV2() {
+        log.info("🚀 더미 데이터 초기화 시작");
+
+        int totalMembers = 50;
+        int logsPerMember = 50;
+
+        for (int m = 1; m <= totalMembers; m++) {
+            // 회원 생성
+            Member member = Member.builder()
+                    .phone("010-0000-" + String.format("%04d", m))
+                    .name("테스트유저" + m)
+                    .build();
+            memberRepository.save(member);
+
+            // 각 회원당 bus_log 50개 생성
+            for (int i = 0; i < logsPerMember; i++) {
+                String departure = "출발지_" + m + "_" + i;
+                String destination = "도착지_" + m + "_" + i;
+                Long station = (long) ((m * 100) + i);
+                String notionId = UUID.randomUUID().toString();
+                String stationId = String.valueOf((m * 1000) + i);
+
+                BusLog busLog = BusLog.builder()
+                        .member(member)
+                        .departure(departure)
+                        .destination(destination)
+                        .station(station)
+                        .notionId(notionId)
+                        .stationId(stationId)
+                        .build();
+                busLogRepository.save(busLog);
+
+                BusFavorite busFavorite = BusFavorite.builder()
+                        .busLog(busLog)
+                        .build();
+                busFavoriteRepository.save(busFavorite);
+
+                BusAlarm busAlarm = BusAlarm.builder()
+                        .busLog(busLog)
+                        .build();
+                busAlarmRepository.save(busAlarm);
+            }
+
+            log.info("✅ {}번 Member의 BusLog 50개 삽입 완료", m);
         }
 
     }

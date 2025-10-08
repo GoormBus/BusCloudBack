@@ -50,7 +50,7 @@ public class StationService {
      *     해당 정류장에 도착한 경우 음성 알림 발송 및 잔여 횟수 차감</li>
      * </ul>
      */
-    @Scheduled(fixedRate = 30000)
+    //@Scheduled(fixedRate = 30000)
     public void callBusScheduler() {
         List<BusLog> findBusLogAll = busLogRepository.findAll();
         for (BusLog busLog : findBusLogAll) {
@@ -73,7 +73,7 @@ public class StationService {
      * <p>버스 로그 생성 이후 24시간이 지난 경우,
      * 알림 잔여 횟수를 2로 초기화합니다.</p>
      */
-    @Scheduled(fixedRate = 60000)
+    //@Scheduled(fixedRate = 60000)
     public void reactivateBusNotification() {
         List<BusLog> findBusLogAll = busLogRepository.findAll();
         for (BusLog busLog : findBusLogAll) {

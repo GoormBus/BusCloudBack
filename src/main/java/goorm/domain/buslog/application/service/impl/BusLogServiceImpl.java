@@ -103,21 +103,7 @@ public class BusLogServiceImpl implements BusLogService {
             throw new GoormBusException(ErrorCode.USER_NOT_EXIST);
 
         List<BusLogAllRes> result = new ArrayList<>();
-        List<BusLog> busLogs = busLogRepository.findByMember(findMember);
-
-        for (BusLog busLog : busLogs) {
-            BusAlarm findBusAlarm = busAlarmRepository.findByBusLog(busLog)
-                    .orElseThrow(() -> new GoormBusException(ErrorCode.BUS_ALARM_NOT_EXIST));
-
-            BusFavorite findBusFavorite = busFavoriteRepository.findByBusLog(busLog)
-                    .orElseThrow(() -> new GoormBusException(ErrorCode.BUS_FAVORITE_NOT_EXIST));
-
-            result.add(BusLogAllRes.of(
-                    busLog,
-                    findBusAlarm.isAlarmFlag(),
-                    findBusFavorite.isFavoriteFlag()
-            ));
-        }
+        result = selectV2(findMember, result);
 
         log.info("BusLog 전체 조회 완료: memberId={}, count={}", memberId, result.size());
         return result;
@@ -146,5 +132,40 @@ public class BusLogServiceImpl implements BusLogService {
         } else {
             findBusFavorite.activateIsFavoriteFlag();
         }
+    }
+
+
+    private List<BusLogAllRes> selectV1(Member findMember, List<BusLogAllRes> result) {
+        List<BusLog> busLogs = busLogRepository.findByMember(findMember);
+
+        for (BusLog busLog : busLogs) {
+            BusAlarm findBusAlarm = busAlarmRepository.findByBusLog(busLog)
+                    .orElseThrow(() -> new GoormBusException(ErrorCode.BUS_ALARM_NOT_EXIST));
+
+            BusFavorite findBusFavorite = busFavoriteRepository.findByBusLog(busLog)
+                    .orElseThrow(() -> new GoormBusException(ErrorCode.BUS_FAVORITE_NOT_EXIST));
+
+            result.add(BusLogAllRes.of(
+                    busLog,
+                    findBusAlarm.isAlarmFlag(),
+                    findBusFavorite.isFavoriteFlag()
+            ));
+        }
+
+        return result;
+    }
+
+
+    private List<BusLogAllRes> selectV2(Member findMember, List<BusLogAllRes> result) {
+        List<BusLog> busLogs = busLogRepository.findAllWithAlarmAndFavorite(findMember);
+
+        return busLogs.stream()
+                .map(busLog -> BusLogAllRes.of(
+                        busLog,
+                        busLog.getBusAlarm().isAlarmFlag(),
+                        busLog.getBusFavorite().isFavoriteFlag()
+                ))
+                .toList();
+
     }
 }
