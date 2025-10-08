@@ -17,7 +17,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @DynamicUpdate
-@Table(name="버스 기록")
+@Table(
+        name = "bus_log",
+        indexes = {
+                @Index(name = "idx_member_id", columnList = "member_id")
+        }
+)
 public class BusLog {
 
     @Id
@@ -28,11 +33,11 @@ public class BusLog {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToMany(mappedBy = "busLog", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BusFavorite> busFavorites = new ArrayList<>();
+    @OneToOne(mappedBy = "busLog", cascade = CascadeType.ALL, orphanRemoval = true)
+    private BusFavorite busFavorite;
 
-    @OneToMany(mappedBy = "busLog", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BusAlarm> busAlarms = new ArrayList<>();
+    @OneToOne(mappedBy = "busLog", cascade = CascadeType.ALL, orphanRemoval = true)
+    private BusAlarm busAlarm;
 
     @Comment("출발지 ex: 제주 공항")
     @Column(nullable = false)

@@ -10,9 +10,17 @@ spring:
     url: ${MYSQL_URL}
     username: ${MYSQL_USER}
     password: ${MYSQL_PASSWORD}
+
   jpa:
     hibernate:
       ddl-auto: create
+    properties:
+      hibernate:
+        show_sql: false              # 기본적으로 SQL 로그는 찍지 않음
+        format_sql: true             # 보기 좋게 포매팅 (켜질 때용)
+        use_sql_comments: false      # JPQL 주석 비활성화
+        generate_statistics: true   # 통계 비활성화 (Hibernate 내부 로그 제거)
+        dialect: org.hibernate.dialect.MySQLDialect
 
   servlet:
     multipart:
@@ -33,10 +41,8 @@ jwt:
 logging:
   level:
     root: INFO
-    org:
-      springframework:
-        web: ERROR
-
+    org.hibernate.SQL: DEBUG                    # SQL 문 출력
+    org.hibernate.orm.jdbc.bind: TRACE           # 파라미터 값 출력
 
 feign:
   client:

@@ -1,0 +1,126 @@
+import http from 'k6/http';
+import { check, sleep } from 'k6';
+
+// 실제 DB에 저장된 member UUID 리스트 (새로운 100개)
+const memberIds = [
+    '01182407-56ed-42fa-8572-26cd17f6883e',
+    '0abc1ca8-24b9-4a08-9d5b-4d84369e9e8d',
+    '0c38dd4f-9cc4-4fb6-99ca-29f7e7ad1310',
+    '0c407fc4-c5b6-4b0e-8b16-c7aa94061358',
+    '0de3e09a-2aa5-4e9f-8167-ec591efbe7fe',
+    '12559101-1146-4e27-8f74-2644381f3087',
+    '13a0671d-c834-4cf4-9371-8869ac9aec1e',
+    '140403ae-73e7-4dff-81a9-24dd5bb36f2b',
+    '18097b27-9921-41d5-acab-a0b6d887a24e',
+    '191bd228-f9c5-4cb6-82b9-73a97527b90c',
+    '1be0b5f1-2d96-4f44-aaa6-2b1b60828250',
+    '21625f4d-9551-4ca0-ac90-c3982f2a871b',
+    '2334fec8-629d-4312-b574-1eb6bd679247',
+    '247bb957-cc83-4f13-b8b4-7b497a66c6ab',
+    '26fc585f-51f9-4495-9e3f-84c804334edf',
+    '2812a4d4-43e5-4f0b-8f71-461b82b87dd1',
+    '2886986c-c1bc-45eb-8e6c-80719b198c07',
+    '2e380834-1321-45ad-9077-7d0e63f99f74',
+    '319fa097-0a11-489e-9284-84261632b952',
+    '32fc915e-df8c-4044-9705-032567fc1d94',
+    '33b9b9ff-0d5e-4038-b189-cf70be028d44',
+    '375c81d9-80d8-4355-aaea-165afd9e4a29',
+    '37f55c8d-7168-4765-9659-27c6ca62393e',
+    '41b1c94e-be72-4f04-aa82-18eb247cb5c5',
+    '46163bef-8c73-4164-98ce-18ced25bb1b0',
+    '476de7e6-5b70-451f-911e-2cbca43e34df',
+    '48e583ba-c25c-4392-9ab8-ec01cf458fb4',
+    '4bd80390-b779-4c2b-b875-7b4463378537',
+    '571d7cad-e629-456a-82d2-0bd830a0bb71',
+    '577b9434-5e3d-4ea9-ab9d-1ae843eac002',
+    '578a2bd0-1aca-426e-8238-5c4023aadbf7',
+    '59030001-3bc0-46d0-998f-e7ac9e40237f',
+    '5a4ac6d9-320e-4ce0-b097-b05b8791de1a',
+    '5ab4944b-8eb7-4fd7-831a-2e254f3727ee',
+    '5e3cebec-18f0-40b8-ac3b-8c342a788fe8',
+    '613e0de4-990a-4d61-bfe3-1ea8b85df27b',
+    '62f01949-148b-4aa2-b36b-5c8866beca16',
+    '68cb8778-ea5c-45ed-af51-fb3c51846b48',
+    '698b0aca-4a59-407e-b7c1-a2551dfc15a8',
+    '6ae06ad4-1b52-4584-8824-e2d31f351093',
+    '6bdbde2b-a0d3-4291-97c8-4efbe4b6a750',
+    '6e386dda-9fb8-41a7-818d-6022f5d04c27',
+    '72ab4b7c-252c-4420-8c19-c323bb78007e',
+    '784da2a7-eb70-42bc-9b1d-cd1e2dbbf745',
+    '7925178e-6525-4544-ba20-aed88b520189',
+    '7960491e-9674-4736-881e-db9f2056f94d',
+    '7b1a1d52-7182-4222-a6b2-bcc8f318001b',
+    '7f293f06-593f-4a71-8e92-d0a35bf521d7',
+    '831fb810-4149-4bb0-bbf6-982a56f674b4',
+    '83432103-eefc-4f8e-8b0c-8230ec6df078',
+    '8574d8f5-bb43-4642-a7c1-3ecb7e16ba69',
+    '8b591765-b665-46a0-b5df-669a14123fd8',
+    '9060cde6-be79-4663-9e92-da42358819da',
+    '9181e6b2-446a-4287-adb9-64ff12a0950a',
+    '91eb941b-e3b3-4bf6-b60a-e79adcc15f9f',
+    '930ddcf8-42a9-4682-8d9f-39315d759529',
+    '931a453e-cb51-4f6a-a929-c5052b5b3f5d',
+    '94a65537-c419-4cfa-a9dd-269e104b2d8d',
+    '9618a049-55a3-48e9-8c77-72740b974aea',
+    '9959db7e-8a8c-4a03-b5ff-23f4c5584136',
+    '9bc528d3-5073-405e-8da6-8ba287c9ccba',
+    '9c6f4267-ad65-4fc4-acc8-70fc86840dff',
+    '9cd1cbe3-aece-4363-b145-5203c9f03d47',
+    '9e70b570-e90a-413c-9f02-61af0227f05f',
+    'a09c7013-ae36-43ad-b457-6b1934253113',
+    'a673db99-f251-4415-8456-ed42b7cd4470',
+    'a759b017-e684-4fe8-9e80-996f2a965e6a',
+    'a8ac3e89-0895-4636-8dde-5ee322c635ea',
+    'b58a0735-f3f8-4a26-b9d6-ddf92faeca24',
+    'b896b7ae-4aa5-499c-a6fd-2e28aaa059dc',
+    'b922ddb5-abde-4d3c-8fb3-78c1d37f47a7',
+    'bbaa8075-f20a-4197-83b5-65ac627f4a52',
+    'bd9d18f2-8aba-4a8f-88b4-2e5118b6dd2d',
+    'c0676a26-c5a7-4c6f-b800-5d40d80e4cdc',
+    'c1e0fd76-d778-4916-aae2-7f66816e3bea',
+    'c1e2fb5f-8f83-4a86-852b-67734b7bf9c9',
+    'c3396940-337a-4094-bdb3-b3af913fc4b1',
+    'c394b3c8-67eb-463a-83a4-b222ff106cb8',
+    'c4a00c79-fb3a-436a-84a6-87a6243c01be',
+    'c692b73c-3d15-4ca0-b8c2-c2411758e282',
+    'c6f5052b-5c70-4c6d-b0ba-514c6b4a3dbb',
+    'cd894e1e-3e9b-4f5d-bb2a-a15c996e8f90',
+    'd1964624-6ca2-4d3d-b59b-516c0406daca',
+    'd4dffb45-5632-4cb9-9384-2c04604069ef',
+    'd50a9a21-969c-42a9-bae2-5e5b2b9c54ce',
+    'd6b76ee6-7ad4-47d8-8d52-a28fc05132c3',
+    'd7198429-533d-4dc8-a851-a9b9f8357b07',
+    'd863ed2c-53f4-461c-baf5-8655431a6196',
+    'd9e2a4e2-8a89-447a-91ad-c034c72200bf',
+    'e02b273f-2734-4b63-bba9-f8c5899484d4',
+    'e712abf2-aae1-4eb6-955a-3b305390f0b9',
+    'e8d03caa-4c9c-4870-ab34-052b9c3d4627',
+    'ea15640e-684d-4721-abcd-1de697311cb5',
+    'ecbc85e7-4502-4b3f-ac36-aa6af8a0064e',
+    'eeab7911-4d52-4ee9-8888-11521d6bae9d',
+    'f0bb5016-2261-442e-9565-d4458c3b5c0d',
+    'f35d665a-0f3c-4621-94b2-a697d7743ef1',
+    'f41745a9-4c17-4cb7-8015-ba9b96d9aebd',
+    'fa5c089c-e446-4258-9d19-08bbf798a14d',
+    'fa8bbe91-3b5b-492f-a79b-2cbbf9a35cbd',
+];
+
+export const options = {
+    vus: 100, // 동시 접속 사용자 수
+    duration: '30s', // 테스트 시간
+    thresholds: {
+        http_req_duration: ['p(95)<500'], // 95% 요청이 0.5초 이내에 끝나야 함
+    },
+};
+
+export default function () {
+    const memberId = memberIds[Math.floor(Math.random() * memberIds.length)];
+    const url = `http://localhost:8080/api/bus?memberId=${memberId}`;
+    const res = http.get(url);
+
+    check(res, {
+        'status is 200': (r) => r.status === 200,
+    });
+
+    sleep(1);
+}

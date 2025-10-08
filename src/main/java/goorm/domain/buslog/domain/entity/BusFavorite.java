@@ -3,6 +3,7 @@ package goorm.domain.buslog.domain.entity;
 import goorm.domain.member.domain.entity.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -15,14 +16,19 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @DynamicUpdate
-@Table(name = "버스 기록 즐겨찾기")
+@Table(
+        name = "bus_favorite",
+        indexes = {
+                @Index(name = "idx_bus_log_id", columnList = "bus_log_id")
+        }
+)
 public class BusFavorite {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bus_log_id")
     private BusLog busLog;
 
@@ -31,6 +37,12 @@ public class BusFavorite {
     @CreationTimestamp
     @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    @Builder
+    public BusFavorite(BusLog busLog){
+        this.busLog = busLog;
+        this.isFavoriteFlag = true; // true로 초기화
+    }
 
 
     public void activateIsFavoriteFlag() {

@@ -17,14 +17,19 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @DynamicUpdate
-@Table(name = "버스 알림")
+@Table(
+        name = "bus_alarm",
+        indexes = {
+                @Index(name = "idx_bus_log_id", columnList = "bus_log_id")
+        }
+)
 public class BusAlarm {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bus_log_id")
     private BusLog busLog;
 

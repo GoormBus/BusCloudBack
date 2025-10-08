@@ -53,7 +53,9 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'    // JWT 파싱용 Jackson 모듈
 
 	// --- ☎ Twilio ---
-	implementation 'com.twilio.sdk:twilio:9.13.0'        // 음성/문자 알림용 Twilio SDK
+	implementation('com.twilio.sdk:twilio:9.13.0') {  // 음성/문자 알림용 Twilio SDK
+		exclude group: 'io.jsonwebtoken'
+	}
 
 	// --- 🌐 Web & WebFlux ---
 	implementation 'org.springframework.boot:spring-boot-starter-web'

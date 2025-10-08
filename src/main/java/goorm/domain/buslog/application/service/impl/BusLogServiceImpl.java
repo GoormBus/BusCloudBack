@@ -43,7 +43,7 @@ public class BusLogServiceImpl implements BusLogService {
     private final BusFavoriteRepository busFavoriteRepository;
     private final BusAlarmRepository busAlarmRepository;
     private final MemberRepository memberRepository;
-    private final StationService stationService;
+
 
     /**
      * 🪧 버스 로그 저장
@@ -63,7 +63,7 @@ public class BusLogServiceImpl implements BusLogService {
         if (findMember == null)
             throw new GoormBusException(ErrorCode.USER_NOT_EXIST);
 
-        BusLog newBusLog = BusLog.builder()
+        BusLog busLog = BusLog.builder()
                 .member(findMember)
                 .departure(req.departure())
                 .destination(req.destination())
@@ -72,7 +72,16 @@ public class BusLogServiceImpl implements BusLogService {
                 .stationId(req.stationId())
                 .build();
 
-        busLogRepository.save(newBusLog);
+        BusAlarm busAlarm = BusAlarm.builder()
+                .busLog(busLog)
+                .build();
+
+        BusFavorite busFavorite = BusFavorite.builder()
+                .busLog(busLog)
+                .build();
+        busLogRepository.save(busLog);
+        busFavoriteRepository.save(busFavorite);
+        busAlarmRepository.save(busAlarm);
     }
 
     /**
@@ -94,21 +103,7 @@ public class BusLogServiceImpl implements BusLogService {
             throw new GoormBusException(ErrorCode.USER_NOT_EXIST);
 
         List<BusLogAllRes> result = new ArrayList<>();
-        List<BusLog> busLogs = busLogRepository.findByMember(findMember);
-
-        for (BusLog busLog : busLogs) {
-            BusAlarm findBusAlarm = busAlarmRepository.findByBusLog(busLog)
-                    .orElseThrow(() -> new GoormBusException(ErrorCode.BUS_ALARM_NOT_EXIST));
-
-            BusFavorite findBusFavorite = busFavoriteRepository.findByBusLog(busLog)
-                    .orElseThrow(() -> new GoormBusException(ErrorCode.BUS_FAVORITE_NOT_EXIST));
-
-            result.add(BusLogAllRes.of(
-                    busLog,
-                    findBusAlarm.isAlarmFlag(),
-                    findBusFavorite.isFavoriteFlag()
-            ));
-        }
+        result = selectV2(findMember, result);
 
         log.info("BusLog 전체 조회 완료: memberId={}, count={}", memberId, result.size());
         return result;
@@ -137,5 +132,40 @@ public class BusLogServiceImpl implements BusLogService {
         } else {
             findBusFavorite.activateIsFavoriteFlag();
         }
+    }
+
+
+    private List<BusLogAllRes> selectV1(Member findMember, List<BusLogAllRes> result) {
+        List<BusLog> busLogs = busLogRepository.findByMember(findMember);
+
+        for (BusLog busLog : busLogs) {
+            BusAlarm findBusAlarm = busAlarmRepository.findByBusLog(busLog)
+                    .orElseThrow(() -> new GoormBusException(ErrorCode.BUS_ALARM_NOT_EXIST));
+
+            BusFavorite findBusFavorite = busFavoriteRepository.findByBusLog(busLog)
+                    .orElseThrow(() -> new GoormBusException(ErrorCode.BUS_FAVORITE_NOT_EXIST));
+
+            result.add(BusLogAllRes.of(
+                    busLog,
+                    findBusAlarm.isAlarmFlag(),
+                    findBusFavorite.isFavoriteFlag()
+            ));
+        }
+
+        return result;
+    }
+
+
+    private List<BusLogAllRes> selectV2(Member findMember, List<BusLogAllRes> result) {
+        List<BusLog> busLogs = busLogRepository.findAllWithAlarmAndFavorite(findMember);
+
+        return busLogs.stream()
+                .map(busLog -> BusLogAllRes.of(
+                        busLog,
+                        busLog.getBusAlarm().isAlarmFlag(),
+                        busLog.getBusFavorite().isFavoriteFlag()
+                ))
+                .toList();
+
     }
 }
