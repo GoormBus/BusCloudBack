@@ -1,5 +1,5 @@
 import http from 'k6/http';
-import { check, sleep } from 'per';
+import { check, sleep } from 'k6';
 
 // 실제 DB에 저장된 member UUID 리스트
 const memberIds = [
